@@ -22,6 +22,7 @@
 - [x] L — Link e conectividade (OpenAI, Docker, Docker Compose e toolchain Flutter Linux verificados).
 - [x] A — Arquitetura: Camada 1 — POPs técnicos concluída em 2026-08-20.
 - [x] A — Arquitetura: Camada 2 — Navegação e orquestração concluída em 2026-08-24.
+- [ ] A — Arquitetura: Camada 3 — Ferramentas e implementação (em andamento).
 - [ ] E — Estilo.
 - [ ] G — Gatilho e implantação.
 

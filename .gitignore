@@ -2,3 +2,9 @@
 .env
 .env.*
 !.env.example
+
+# Artefatos locais de Python e testes
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]

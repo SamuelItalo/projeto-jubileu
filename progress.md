@@ -56,3 +56,5 @@
 - Autorizado modo de autenticação sem senha somente para testes locais, mediante `APP_ALLOW_INSECURE_TEST_AUTH=true`; ele permanece desabilitado por padrão e proibido fora de desenvolvimento.
 - Corrigido o valor de exemplo de `OPENAI_API_KEY` em `.env.example`.
 - Concluída a Camada 2 — Navegação e orquestração. O POP 05 define a decisão por rota, idempotência, confirmação vocal determinística, resolução de grupos e o limite transacional de ações múltiplas.
+- Iniciada a Camada 3 — Ferramentas e implementação: criado o esqueleto FastAPI, Docker Compose, modelos SQLAlchemy, configuração de segurança, migração Alembic inicial e testes de sanidade. O processamento completo de comandos e o adaptador da IA permanecem para o próximo incremento.
+- Validação de integração concluída em ambiente temporário: PostgreSQL iniciou, a migração Alembic `20260824_0001` foi aplicada e a API respondeu `200` em `/health`. O ambiente temporário e seu volume foram removidos após o teste.

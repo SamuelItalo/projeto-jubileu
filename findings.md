@@ -87,3 +87,8 @@
 - A confirmação de criação de tarefa é obrigatória no MVP e não será exposta como preferência configurável.
 - A confirmação de ações múltiplas usa `confirmation_context` com `group_id` e `action_id` opcional. A persistência exige registros de grupo e de itens pendentes para permitir resolução total ou individual.
 - A ausência de senha é permitida exclusivamente em testes locais, mediante flag explícita de desenvolvimento. O modo é desabilitado por padrão e não pode ser usado fora do ambiente local.
+
+## Camada 3 — fundação validada — 2026-08-24
+
+- O esqueleto FastAPI, PostgreSQL 16, SQLAlchemy 2 e Alembic foi validado em contêineres locais. A migração inicial chegou à revisão `20260824_0001` e a rota `/health` respondeu com sucesso.
+- Para executar persistentemente com Docker Compose, o `.env` local precisa definir `POSTGRES_PASSWORD`; o valor não foi criado nem gravado automaticamente.
