@@ -1,0 +1,57 @@
+# Progresso
+
+## 2026-08-15
+
+- Lido e compreendido o protocolo V.L.A.E.G. em `Passo-a-Passo/prootocolo-vlaeg.md`.
+- Concluída a etapa 1 do Protocolo 0: criados os arquivos de memória `task_plan.md`, `findings.md` e `progress.md`.
+- Nenhum script, ferramenta, esquema de dados ou integração foi criado nesta etapa.
+- Concluída a etapa 2 do Protocolo 0: criado `gpeto.md` como Constituição do Projeto, com schemas provisoriamente pendentes, regras comportamentais e invariantes arquiteturais.
+- Concluída a etapa 3 do Protocolo 0: a execução de scripts e ferramentas foi formalmente bloqueada até a conclusão das perguntas de descoberta, dos schemas de dados e da aprovação do blueprint.
+- Iniciada a Fase 1 — Visão, passo 1 (Descoberta): a Estrela Guia foi respondida.
+- Descoberta: a integração do MVP foi definida como Google Calendar via OAuth 2.0, com armazenamento local para os demais dados.
+- Descoberta: PostgreSQL foi definido como fonte de verdade persistente, com Flutter como cliente multiplataforma e Google Calendar como contexto complementar.
+- Descoberta: o payload do MVP foi definido como uma experiência Flutter orientada por voz, com criação e controle de tarefas, cronômetro e visão diária objetiva.
+- Concluída a Fase 1 — Visão, passo 1 (Descoberta): as cinco perguntas foram respondidas e as regras comportamentais foram registradas em `gpeto.md`.
+
+## 2026-08-18
+
+- Concluída a Fase 1 — Visão, passo 2: definido e confirmado o schema JSON de entrada `VoiceCommandRequest` e o schema de saída `AssistantResponse` em `gpeto.md`.
+- Registrados os estados de processamento e de tarefa, a confirmação obrigatória para criação de tarefas e o cálculo determinístico da duração total.
+- Registrada como futura a avaliação do Open Jarvis para áudio; nenhuma pesquisa, decisão técnica ou integração foi realizada nesta etapa.
+- O portão para `tools/` permanece bloqueado exclusivamente pela ausência de blueprint aprovado.
+- Concluída a pesquisa técnica da Fase 1: Flutter tem suporte oficial ao desktop Linux; FastAPI, PostgreSQL e Docker Compose atendem à execução local e à futura migração para VPS.
+- Definidos para o MVP: Ubuntu 24.04, Flutter Linux, FastAPI, PostgreSQL local em Docker Compose e IA em nuvem para interpretação de texto transcrito.
+- O Google Calendar e os recursos de áudio contínuo permanecem fora da primeira entrega. Um blueprint foi incluído no `task_plan.md` e aguarda aprovação.
+- Blueprint aprovado pelo usuário. A Fase 1 — Visão está concluída e a Fase 2 — Link foi iniciada.
+- Verificação inicial da Fase 2: Docker, Docker Compose e Python estão operacionais; Flutter não está instalado e não há `.env` ou credenciais de IA para validar.
+- A conclusão da Fase 2 depende da escolha do provedor de IA, da configuração segura da respectiva chave no `.env` e da instalação do Flutter para o cliente Linux.
+- OpenAI selecionada como provedor. Criados `.env.example` e `.gitignore` para orientar a configuração local e impedir o versionamento do `.env`; a chave real permanece pendente de criação e inserção pelo usuário.
+- Concluído o handshake com a OpenAI: `GET /v1/models` respondeu HTTP 200. Criada e testada a ferramenta determinística `tools/verify_openai_connection.py`, que valida a autenticação sem exibir ou gravar a chave.
+- Instalados Flutter `3.47.0` e Dart `3.13.0` no diretório do usuário; o caminho do SDK foi incluído em `/home/ixcsoft/.bashrc`.
+- `flutter doctor -v` confirmou Flutter, rede e dispositivo Linux. A toolchain Linux continua pendente somente pela ausência de `libgtk-3-dev`, cuja instalação requer senha de `sudo` do usuário.
+
+## 2026-08-19
+
+- Concluída a Fase 2 — Link, etapa 1 (Verificação): `OPENAI_API_KEY` está configurada no `.env` e o handshake da OpenAI retornou HTTP 200, com 118 modelos acessíveis.
+- Docker `29.1.3` e o daemon local estão operacionais. O Compose disponível neste ambiente é o comando legado `docker-compose` (`v2.29.2`); `docker compose` não está instalado.
+- A dependência `libgtk-3-dev` foi instalada e `flutter doctor -v` confirmou a toolchain Linux sem pendências.
+- O `.env.example` foi verificado sem uma chave de API com formato real. Ainda não há backend ou arquivo Compose do projeto; ambos serão criados na Fase 3 — Arquitetura.
+- Iniciada a Fase 3 — Arquitetura, Camada 1: criados os POPs para processamento de comandos, ciclo de vida/tempo das tarefas e fronteiras entre Flutter, API, IA e PostgreSQL. Nenhum código de aplicação foi criado.
+- Identificada uma pendência que bloqueia a especificação da API: o contrato atual recebe `intent` e `actions` do Flutter, mas o blueprint atribui a interpretação desses dados à IA orquestrada pelo FastAPI. A decisão será solicitada ao usuário antes de alterar o schema ou implementar endpoints.
+- Decisão de contrato confirmada pelo usuário: Flutter envia somente a transcrição e metadados; FastAPI chama a OpenAI e valida o contrato interno `InterpretedCommand`. `gpeto.md` e os POPs foram atualizados antes de qualquer código.
+- Definidos para o MVP: usuário local único Samuel com senha armazenada somente como hash e confirmação/cancelamento preferencial por voz. Tarefas de nomes semelhantes sempre exigem esclarecimento. Criado o POP de acesso local e confirmação por voz; a validade de ações pendentes ainda requer decisão.
+- Definida a validade de uma ação pendente: cinco minutos após sua criação. Confirmações posteriores não produzem alteração e exigem novo comando.
+- Definido que a sessão de Samuel persiste após reiniciar o aplicativo até logout explícito, sem apagar registros. Tarefas concluídas são definitivas no MVP; trabalho posterior requer nova tarefa.
+
+## 2026-08-20
+
+- Concluída a Camada 1 da Fase 3 — Arquitetura. O POP 03 agora define endpoints HTTP, autenticação de sessão, tabelas PostgreSQL, índices e invariantes, erros públicos, variáveis de ambiente e idempotência por `request_id`.
+- O contrato de confirmação por voz passou a usar contexto opaco de confirmação, vinculando a nova fala a uma ação pendente do usuário autenticado.
+- Nenhum código de aplicação, migração ou serviço foi criado nesta etapa; a próxima camada é Navegação e orquestração.
+
+## 2026-08-24
+
+- Confirmado que a criação de tarefas sempre exige confirmação vocal explícita no MVP; a preferência que permitiria desativá-la foi removida da arquitetura.
+- Ratificado o contexto de confirmação por grupo e item: `confirmation_context` usa `group_id` e `action_id` opcional. O modelo relacional agora prevê `pending_action_groups` para persistir essa relação de modo determinístico.
+- Autorizado modo de autenticação sem senha somente para testes locais, mediante `APP_ALLOW_INSECURE_TEST_AUTH=true`; ele permanece desabilitado por padrão e proibido fora de desenvolvimento.
+- Corrigido o valor de exemplo de `OPENAI_API_KEY` em `.env.example`.
