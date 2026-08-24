@@ -21,7 +21,7 @@
 - [x] V — Pesquisa técnica e de referências para o MVP.
 - [x] L — Link e conectividade (OpenAI, Docker, Docker Compose e toolchain Flutter Linux verificados).
 - [x] A — Arquitetura: Camada 1 — POPs técnicos concluída em 2026-08-20.
-- [ ] A — Arquitetura: Camada 2 — Navegação e orquestração (em preparação).
+- [x] A — Arquitetura: Camada 2 — Navegação e orquestração concluída em 2026-08-24.
 - [ ] E — Estilo.
 - [ ] G — Gatilho e implantação.
 

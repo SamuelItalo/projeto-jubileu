@@ -55,3 +55,4 @@
 - Ratificado o contexto de confirmação por grupo e item: `confirmation_context` usa `group_id` e `action_id` opcional. O modelo relacional agora prevê `pending_action_groups` para persistir essa relação de modo determinístico.
 - Autorizado modo de autenticação sem senha somente para testes locais, mediante `APP_ALLOW_INSECURE_TEST_AUTH=true`; ele permanece desabilitado por padrão e proibido fora de desenvolvimento.
 - Corrigido o valor de exemplo de `OPENAI_API_KEY` em `.env.example`.
+- Concluída a Camada 2 — Navegação e orquestração. O POP 05 define a decisão por rota, idempotência, confirmação vocal determinística, resolução de grupos e o limite transacional de ações múltiplas.

@@ -4,7 +4,7 @@
 
 - **Protocolo:** V.L.A.E.G. — Visão, Link, Arquitetura, Estilo e Gatilho.
 - **Arquitetura:** A.N.T. — Arquitetura, Navegação e Ferramentas.
-- **Estado atual:** Fases 1 — Visão e 2 — Link concluídas. A Fase 3 — Arquitetura está em andamento, iniciada pela Camada 1 (POPs técnicos).
+- **Estado atual:** Fases 1 — Visão e 2 — Link concluídas. Na Fase 3 — Arquitetura, as Camadas 1 (POPs técnicos) e 2 (navegação e orquestração) estão concluídas; a Camada 3 — ferramentas e implementação está pronta para iniciar.
 - **Objetivo do projeto:** criar um assistente pessoal inteligente, orientado por voz, que acompanhe o trabalho do usuário, registre atividades, meça o tempo por tarefa e produza insights práticos de produtividade.
 
 ## Fonte de verdade e componentes
@@ -171,3 +171,4 @@ Atualize este documento somente quando um schema, regra comportamental ou invari
 | 2026-08-20 | Referência opaca de ação pendente adicionada aos contratos de comando e resposta. | Vincular confirmação por voz de forma determinística e segura. |
 | 2026-08-20 | Confirmação vocal obrigatória e grupos de ações definidos. | Decisões do usuário para a Camada 2 de navegação. |
 | 2026-08-24 | Confirmação de criação tornou-se obrigatória e o contexto de grupos foi ratificado. | Decisões do usuário antes da implementação. |
+| 2026-08-24 | Navegação e orquestração definidas. | Conclusão da Camada 2 da arquitetura A.N.T. |
