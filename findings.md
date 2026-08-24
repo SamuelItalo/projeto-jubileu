@@ -92,3 +92,4 @@
 
 - O esqueleto FastAPI, PostgreSQL 16, SQLAlchemy 2 e Alembic foi validado em contêineres locais. A migração inicial chegou à revisão `20260824_0001` e a rota `/health` respondeu com sucesso.
 - Para executar persistentemente com Docker Compose, o `.env` local precisa definir `POSTGRES_PASSWORD`; o valor não foi criado nem gravado automaticamente.
+- Uma senha PostgreSQL com caracteres especiais exige composição segura da URL de conexão. A API passou a construí-la a partir dos campos `POSTGRES_*`, e o Alembic conecta diretamente por essa URL para evitar interpretação indevida de caracteres pelo Compose ou pelo parser INI.

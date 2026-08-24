@@ -82,6 +82,8 @@ Datas são armazenadas em UTC. `timezone` preserva o fuso de exibição informad
 | `APP_INITIAL_PASSWORD` | secreto | Senha inicial; transformada em hash e nunca persistida em texto puro. |
 | `APP_ALLOW_INSECURE_TEST_AUTH` | não secreto, desenvolvimento somente | Quando `true`, permite iniciar localmente sem senha apenas para testes. É proibida fora do ambiente de desenvolvimento e assume `false` por padrão. |
 
+Quando a API usa `POSTGRES_PASSWORD` para compor a conexão local, ela deve construir a URL com um gerador seguro de URLs, e não por interpolação de texto. Isso preserva caracteres especiais da senha. O Alembic deve receber essa URL diretamente ao criar o engine, sem passá-la pelo parser do arquivo INI.
+
 ## Entrega da Camada 1
 
 Os contratos HTTP, o modelo relacional, as regras de sessão, os erros e a idempotência estão definidos neste POP. Migrações e código só poderão seguir estas definições ou uma atualização prévia deste documento.

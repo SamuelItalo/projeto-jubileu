@@ -20,3 +20,8 @@ def test_production_requires_initial_password() -> None:
     with pytest.raises(ValidationError):
         Settings(app_environment="production")
 
+
+def test_postgres_password_is_url_encoded() -> None:
+    settings = Settings(postgres_password="senha#com@caracteres")
+    assert settings.database_url is not None
+    assert "senha%23com%40caracteres" in settings.database_url

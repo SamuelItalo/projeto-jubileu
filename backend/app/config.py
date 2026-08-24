@@ -4,13 +4,18 @@ from functools import lru_cache
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import URL
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_environment: str = "development"
-    database_url: str = "postgresql+psycopg://jubileu:jubileu@db:5432/jubileu"
+    database_url: str | None = None
+    database_host: str = "db"
+    postgres_db: str = "jubileu"
+    postgres_user: str = "jubileu"
+    postgres_password: str | None = None
     app_initial_username: str = "Samuel"
     app_initial_password: str | None = None
     app_allow_insecure_test_auth: bool = False
@@ -23,10 +28,20 @@ class Settings(BaseSettings):
             raise ValueError("APP_ALLOW_INSECURE_TEST_AUTH só é permitido em development ou test")
         if self.app_environment not in local_environments and not self.app_initial_password:
             raise ValueError("APP_INITIAL_PASSWORD é obrigatória fora de development/test")
+        if not self.database_url:
+            if not self.postgres_password:
+                raise ValueError("POSTGRES_PASSWORD ou DATABASE_URL é obrigatório")
+            self.database_url = URL.create(
+                drivername="postgresql+psycopg",
+                username=self.postgres_user,
+                password=self.postgres_password,
+                host=self.database_host,
+                port=5432,
+                database=self.postgres_db,
+            ).render_as_string(hide_password=False)
         return self
 
 
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

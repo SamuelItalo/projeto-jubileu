@@ -17,7 +17,7 @@ services:
     build: .
     env_file: .env
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-jubileu}:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}@db:5432/${POSTGRES_DB:-jubileu}
+      DATABASE_HOST: db
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -26,4 +26,3 @@ services:
 
 volumes:
   postgres_data:
-
