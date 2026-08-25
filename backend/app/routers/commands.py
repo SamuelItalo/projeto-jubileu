@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.dependencies import get_current_user
 from app.models import User
 from app.schemas import AssistantResponse, VoiceCommandRequest
+from app.services.commands import process_command as process_deterministic_command
 
 router = APIRouter(tags=["commands"])
 
@@ -17,8 +18,4 @@ def process_command(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> AssistantResponse:
-    raise HTTPException(
-        status.HTTP_501_NOT_IMPLEMENTED,
-        detail={"code": "implementation_pending", "message": "Processamento de comandos será entregue no próximo incremento."},
-    )
-
+    return process_deterministic_command(db, user, payload)

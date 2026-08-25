@@ -59,3 +59,8 @@
 - Iniciada a Camada 3 — Ferramentas e implementação: criado o esqueleto FastAPI, Docker Compose, modelos SQLAlchemy, configuração de segurança, migração Alembic inicial e testes de sanidade. O processamento completo de comandos e o adaptador da IA permanecem para o próximo incremento.
 - Validação de integração concluída em ambiente temporário: PostgreSQL iniciou, a migração Alembic `20260824_0001` foi aplicada e a API respondeu `200` em `/health`. O ambiente temporário e seu volume foram removidos após o teste.
 - Corrigida a inicialização com senhas PostgreSQL que contêm caracteres especiais: a URL agora é construída de forma segura e o Alembic a usa diretamente. Validação repetida com sucesso: banco e API permanecem ativos, migração aplicada e `/health` retorna `200`.
+
+## 2026-08-25
+
+- Instituído e implementado o interpretador determinístico local, gratuito e sem transmissão de dados. Ele reconhece criação, início, pausa, retomada, conclusão e nota por uma gramática explícita; a criação continua exigindo confirmação vocal.
+- Validação de integração do parser concluída: `criar tarefa teste do parser` retornou confirmação pendente e `cancelo` resolveu a ação como rejeitada, sem criar tarefa. A API continuou saudável.

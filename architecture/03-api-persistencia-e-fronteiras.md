@@ -9,8 +9,9 @@ Definir responsabilidades e limites de confiança para que Flutter, FastAPI, IA 
 | Componente | Responsabilidade | Não pode fazer |
 | --- | --- | --- |
 | Flutter | Capturar interação, enviar solicitação, exibir resposta e enviar confirmação explícita. | Decidir estado, calcular duração oficial ou acessar segredos. |
-| FastAPI | Validar contratos, aplicar POPs, orquestrar IA, persistir e responder. | Confiar cegamente em texto/JSON da IA ou executar ação sem regra/confirmação. |
-| IA em nuvem | Interpretar somente o texto transcrito e devolver estrutura candidata. | Acessar banco, receber chave no cliente ou executar mudanças. |
+| FastAPI | Validar contratos, aplicar POPs, orquestrar interpretador, persistir e responder. | Confiar cegamente em texto/JSON de um interpretador ou executar ação sem regra/confirmação. |
+| Parser determinístico local | Reconhecer a gramática do POP 01 e devolver estrutura candidata sem acesso externo. | Persistir, alterar estados ou inferir comandos fora da gramática. |
+| IA em nuvem futura | Interpretar somente o texto transcrito e devolver estrutura candidata. | Acessar banco, receber chave no cliente ou executar mudanças. |
 | PostgreSQL | Fonte de verdade para tarefas, intervalos, notas, preferências, transcrições e resultados de interpretação. | Substituir as validações da API. |
 
 ## Interfaces HTTP
@@ -81,6 +82,7 @@ Datas são armazenadas em UTC. `timezone` preserva o fuso de exibição informad
 | `APP_INITIAL_USERNAME` | não secreto | Valor inicial `Samuel`; usado apenas na primeira inicialização. |
 | `APP_INITIAL_PASSWORD` | secreto | Senha inicial; transformada em hash e nunca persistida em texto puro. |
 | `APP_ALLOW_INSECURE_TEST_AUTH` | não secreto, desenvolvimento somente | Quando `true`, permite iniciar localmente sem senha apenas para testes. É proibida fora do ambiente de desenvolvimento e assume `false` por padrão. |
+| `COMMAND_INTERPRETER` | não secreto | Interpretador de comando ativo; aceita `deterministic` (padrão) e reservará `openai` para integração futura. |
 
 Quando a API usa `POSTGRES_PASSWORD` para compor a conexão local, ela deve construir a URL com um gerador seguro de URLs, e não por interpolação de texto. Isso preserva caracteres especiais da senha. O Alembic deve receber essa URL diretamente ao criar o engine, sem passá-la pelo parser do arquivo INI.
 

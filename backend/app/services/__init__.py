@@ -1,0 +1,2 @@
+"""Serviços determinísticos de domínio."""
+

@@ -12,7 +12,7 @@ Definir como o backend escolhe, de forma previsível, entre autenticar, validar,
 | `GET /auth/session` | Validar token ativo. | Sessão válida ou `401`. |
 | `POST /auth/logout` | Revogar somente o token atual. | Confirmação sem apagar dados. |
 | `GET /day` | Validar token e consultar tarefas no fuso solicitado. | Visão diária somente de leitura. |
-| `POST /commands` sem `confirmation_context` | Validar e interpretar a fala. | Esclarecimento, confirmação pendente ou ação concluída. |
+| `POST /commands` sem `confirmation_context` | Validar e interpretar a fala pelo interpretador configurado. | Esclarecimento, confirmação pendente ou ação concluída. |
 | `POST /commands` com `confirmation_context` | Validar grupo/item pendente e classificar a fala exclusivamente como confirmação, cancelamento ou ambiguidade. | Ações originais aplicadas, descartadas ou `needs_clarification`. |
 
 ## Fluxo de `POST /commands`
@@ -21,7 +21,7 @@ Definir como o backend escolhe, de forma previsível, entre autenticar, validar,
 2. Consultar `voice_requests` pelo `request_id`: devolver a resposta persistida se já concluído; devolver `409 request_in_progress` se ainda estiver processando.
 3. Registrar a solicitação como `processing` em transação.
 4. Se houver `confirmation_context`, verificar expiração, estado do grupo e do item. Normalizar a nova transcrição e classificá-la deterministicamente como confirmação explícita, cancelamento explícito ou ambiguidade. A IA não é chamada nessa rota.
-5. Sem contexto de confirmação, enviar somente a transcrição e o contexto mínimo ao adaptador de IA e validar o `InterpretedCommand` retornado.
+5. Sem contexto de confirmação, executar o interpretador configurado e validar o `InterpretedCommand` retornado. O padrão é o parser determinístico local; futura IA em nuvem será apenas uma alternativa.
 6. Resolver referências de tarefa. Alvo ausente, ambíguo ou semelhante produz `needs_clarification`, sem alterar tarefas.
 7. Para `create_task`, gerar `pending_action_groups` e `pending_actions`, com validade de cinco minutos, e devolver `awaiting_confirmation`.
 8. Para `start_task`, `pause_task`, `resume_task`, `complete_task` e `add_note`, exigir comando explícito e alvo único; aplicar a transição ou nota diretamente, pois a própria fala explícita é a autorização exigida pelo MVP.

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     app_initial_username: str = "Samuel"
     app_initial_password: str | None = None
     app_allow_insecure_test_auth: bool = False
+    command_interpreter: str = "deterministic"
     openai_api_key: str | None = None
 
     @model_validator(mode="after")
@@ -28,6 +29,8 @@ class Settings(BaseSettings):
             raise ValueError("APP_ALLOW_INSECURE_TEST_AUTH só é permitido em development ou test")
         if self.app_environment not in local_environments and not self.app_initial_password:
             raise ValueError("APP_INITIAL_PASSWORD é obrigatória fora de development/test")
+        if self.command_interpreter != "deterministic":
+            raise ValueError("Somente COMMAND_INTERPRETER=deterministic está disponível no MVP atual")
         if not self.database_url:
             if not self.postgres_password:
                 raise ValueError("POSTGRES_PASSWORD ou DATABASE_URL é obrigatório")

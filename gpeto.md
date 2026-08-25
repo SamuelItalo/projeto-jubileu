@@ -15,7 +15,7 @@
 - **Escopo da primeira entrega:** operação local no Ubuntu 24.04, sem integração com Google Calendar.
 - **Backend:** Python com FastAPI.
 - **Infraestrutura inicial:** PostgreSQL e API executados localmente com Docker Compose; a futura migração para VPS deverá preservar a mesma composição de serviços.
-- **IA:** serviço de IA em nuvem para interpretar texto já transcrito e devolver dados estruturados compatíveis com os schemas deste documento.
+- **Interpretador de comandos:** o MVP inicia com parser determinístico local, gratuito e sem chamadas externas. Um adaptador de IA em nuvem poderá ser habilitado posteriormente para ampliar a compreensão de linguagem natural, sempre devolvendo dados estruturados compatíveis com os schemas deste documento.
 
 ## Esquemas de dados
 
@@ -42,11 +42,11 @@ Os schemas abaixo foram confirmados para o MVP. O áudio é transcrito antes de 
 - `source` será `voice` no MVP.
 - O Flutter envia apenas a transcrição e seus metadados; ele não interpreta intenção, não produz ações e não informa se uma confirmação é necessária.
 - `confirmation_context` é opcional e só é enviado ao confirmar ou cancelar por voz uma ação pendente apresentada pelo backend. Ele contém a referência opaca do grupo e, opcionalmente, de um item; ambas são validadas pelo servidor e pertencem à sessão de Samuel.
-- O FastAPI envia somente o texto e o contexto mínimo necessário à IA em nuvem, valida a resposta e produz internamente ações candidatas.
+- O FastAPI entrega a transcrição somente ao interpretador interno selecionado, valida a resposta e produz internamente ações candidatas. O parser determinístico local não transmite dados; uma futura IA em nuvem receberá apenas texto e contexto mínimo necessário.
 
 ### Contrato interno de interpretação
 
-- **Status:** definido para uso exclusivo entre o orquestrador FastAPI e o adaptador de IA; não é exposto ao Flutter.
+- **Status:** definido para uso exclusivo entre o orquestrador FastAPI e o interpretador selecionado (parser determinístico ou adaptador de IA); não é exposto ao Flutter.
 - **Formato:** objeto JSON `InterpretedCommand`.
 
 ```json
@@ -173,3 +173,4 @@ Atualize este documento somente quando um schema, regra comportamental ou invari
 | 2026-08-24 | Confirmação de criação tornou-se obrigatória e o contexto de grupos foi ratificado. | Decisões do usuário antes da implementação. |
 | 2026-08-24 | Navegação e orquestração definidas. | Conclusão da Camada 2 da arquitetura A.N.T. |
 | 2026-08-24 | Fundação executável da Camada 3 criada e validada. | Início da implementação com FastAPI, PostgreSQL, Alembic e Docker Compose. |
+| 2026-08-25 | Parser determinístico local instituído como interpretador inicial. | Permitir testes gratuitos e confiáveis antes da integração opcional de IA. |
