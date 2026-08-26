@@ -4,7 +4,7 @@ Assistente pessoal local orientado por voz. O backend recebe transcrições, apl
 
 ## Estado atual
 
-A fundação da Camada 3 está pronta: FastAPI, PostgreSQL, migração Alembic, autenticação local e testes básicos. O processamento completo de comandos ainda será implementado.
+A fundação do backend e o primeiro cliente Flutter da Camada 3 estão prontos: FastAPI, PostgreSQL, autenticação local, parser determinístico, visão diária e interface Linux. A entrada atual é textual; captura de áudio ainda não faz parte desta etapa.
 
 O interpretador inicial é local, determinístico e gratuito. Ele não chama nenhum serviço de IA.
 
@@ -40,6 +40,27 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/pytest -q
 ```
+
+## Cliente Flutter para Linux
+
+O cliente está em `frontend/`. Ele guarda o token de sessão no cofre seguro do Linux, restaura a sessão, exibe a visão diária, atualiza o cronômetro da tarefa ativa e envia comandos textuais para a API local.
+
+Antes da primeira compilação Linux, instale a dependência do cofre seguro:
+
+```bash
+sudo apt update
+sudo apt install -y libsecret-1-dev
+```
+
+Com a API iniciada em outro terminal, execute:
+
+```bash
+cd frontend
+/home/ixcsoft/develop/flutter/bin/flutter pub get
+/home/ixcsoft/develop/flutter/bin/flutter run -d linux
+```
+
+O endereço padrão é `http://127.0.0.1:8000/v1`. Para outro endereço ou fuso, use `--dart-define`, por exemplo: `--dart-define=API_BASE_URL=http://127.0.0.1:8000/v1 --dart-define=USER_TIMEZONE=America/Recife`.
 
 ## Limpeza local
 

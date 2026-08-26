@@ -104,3 +104,8 @@
 - A visão diária usa o fuso de `user_preferences` (com `America/Recife` como padrão) para delimitar o início e o fim de cada dia.
 - A duração do dia é calculada por sobreposição de intervalos, portanto não duplica tempo que atravessa meia-noite e inclui intervalos ativos até o momento da leitura.
 - Uma restrição parcial no PostgreSQL garante que cada usuário tenha no máximo uma tarefa com status `in_progress`.
+
+## Cliente Flutter Linux — 2026-08-26
+
+- `flutter_secure_storage` usa o serviço seguro do sistema no Linux e exige o pacote de desenvolvimento `libsecret-1-dev` para compilar. Não é uma dependência do backend.
+- A interface usa o token apenas em memória para chamadas HTTP e o persiste no cofre seguro; mensagens e telas não exibem esse token.

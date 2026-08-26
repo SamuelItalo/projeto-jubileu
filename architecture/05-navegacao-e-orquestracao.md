@@ -49,6 +49,15 @@ Quando confirmar um grupo, o backend valida todas as ações antes de começar e
 | IA indisponível ou retorno inválido | `502 interpretation_unavailable`, sem pendência nem mudança de tarefa. |
 | Repetição do mesmo `request_id` | Reutilizar a resposta persistida; nunca reaplicar a ação. |
 
+## Cliente Flutter da Camada 3
+
+- O cliente Linux usa `http://127.0.0.1:8000/v1` como endereço padrão local, configurável por argumento de compilação `--dart-define=API_BASE_URL=...`.
+- Na abertura, restaura o token do armazenamento seguro e consulta `GET /auth/session`. Se ele for inválido, remove-o localmente e mostra a tela de acesso.
+- Após a sessão válida, consulta `GET /day` e exibe tarefa ativa, cronômetro calculado localmente a partir de `total_duration_seconds` e lista de tarefas. A duração oficial continua sendo do servidor.
+- O campo de comando envia texto como transcrição para `POST /commands`, com UUID novo, horário UTC e fuso local. Enquanto a entrada por microfone não estiver implementada, o rótulo da interface deixa claro que é um teste por texto.
+- Quando a resposta exigir confirmação, o cliente guarda e exibe exclusivamente o `confirmation_context` retornado; os botões enviam uma nova fala explícita (`confirmo` ou `cancelo`) com novo UUID. Nunca executam ações diretamente.
+- Erros de rede, autenticação e respostas de esclarecimento são exibidos em linguagem curta, sem mostrar token, detalhes internos ou segredos.
+
 ## Entrega da Camada 2
 
 Esta navegação conecta os POPs técnicos a implementações determinísticas do backend. A próxima etapa é construir a Camada 3: projeto FastAPI, modelos, migrações, serviços de persistência, adaptador de IA e testes dos fluxos acima.
