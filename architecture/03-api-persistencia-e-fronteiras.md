@@ -24,9 +24,11 @@ Todos os caminhos usam o prefixo `/v1` e JSON. Com exceção de `POST /auth/logi
 | `GET /auth/session` | nenhum | Confirma que a sessão persistida continua válida. |
 | `POST /auth/logout` | nenhum | Revoga somente a sessão atual; não remove dados. |
 | `POST /commands` | `VoiceCommandRequest` | Processa transcrição, cria ação pendente quando exigido e devolve `AssistantResponse`. |
-| `GET /day?date=YYYY-MM-DD` | data opcional no fuso do usuário | Devolve tarefas, tarefa ativa e duração corrente do dia; não altera dados. |
+| `GET /day?date=YYYY-MM-DD` | data opcional no fuso do usuário | Devolve tarefas, tarefa ativa e `total_duration_seconds` do dia; não altera dados. |
 
 Uma confirmação ou cancelamento por voz também usa `POST /commands`: o Flutter envia nova transcrição e o `confirmation_context` recebido previamente, contendo `group_id` e, opcionalmente, `action_id`. Não há endpoint que confirme uma ação sem fala explícita.
+
+Para `GET /day`, a data é interpretada em `user_preferences.timezone` (padrão `America/Recife`). A resposta inclui as tarefas abertas e as concluídas que foram criadas, concluídas ou tiveram algum intervalo sobreposto ao dia consultado. A duração diária é a soma apenas da parcela dos intervalos dentro desse dia, incluindo um intervalo aberto até o instante da leitura.
 
 ## Modelo relacional
 
@@ -35,7 +37,7 @@ Uma confirmação ou cancelamento por voz também usa `POST /commands`: o Flutte
 | `users` | `id UUID PK`, `username`, `password_hash`, `created_at`, `updated_at` | `username` único; somente Samuel no MVP. |
 | `sessions` | `id UUID PK`, `user_id FK`, `token_hash`, `created_at`, `last_seen_at`, `revoked_at` | `token_hash` único; índice em `user_id, revoked_at`; token puro nunca é armazenado. |
 | `user_preferences` | `user_id PK/FK`, `timezone`, `updated_at` | Cria preferência padrão junto do usuário; a confirmação de criação não é configurável no MVP. |
-| `tasks` | `id UUID PK`, `user_id FK`, `title`, `description`, `category`, `priority`, `mood`, `status`, `created_at`, `started_at`, `ended_at`, `completed_at` | Índice em `user_id, status`; `status` limitado aos quatro estados do POP 02. |
+| `tasks` | `id UUID PK`, `user_id FK`, `title`, `description`, `category`, `priority`, `mood`, `status`, `created_at`, `started_at`, `ended_at`, `completed_at` | Índice em `user_id, status`; unicidade parcial de uma tarefa `in_progress` por usuário; `status` limitado aos quatro estados do POP 02. |
 | `task_time_intervals` | `id UUID PK`, `task_id FK`, `started_at`, `ended_at`, `created_at` | Índice em `task_id, started_at`; `ended_at` nulo somente no intervalo ativo; unicidade parcial de um intervalo ativo por tarefa. |
 | `task_notes` | `id UUID PK`, `task_id FK`, `content`, `source`, `created_at` | Índice em `task_id, created_at`. |
 | `voice_requests` | `request_id UUID PK`, `user_id FK`, `occurred_at`, `timezone`, `source`, `transcript`, `status`, `response_json`, `created_at`, `completed_at` | Chave primária em `request_id`; índice em `user_id, created_at`; guarda resposta para retentativa idempotente. |

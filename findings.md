@@ -98,3 +98,9 @@
 
 - O modo gratuito reconhece comandos locais de criação, início, pausa, retomada, conclusão e anotação. Ele aceita somente a gramática registrada no POP 01 e devolve esclarecimento para frases fora dela.
 - A validação de integração confirmou o ciclo seguro de criação pendente e cancelamento por voz, sem persistir a tarefa cancelada.
+
+## Visão diária — 2026-08-26
+
+- A visão diária usa o fuso de `user_preferences` (com `America/Recife` como padrão) para delimitar o início e o fim de cada dia.
+- A duração do dia é calculada por sobreposição de intervalos, portanto não duplica tempo que atravessa meia-noite e inclui intervalos ativos até o momento da leitura.
+- Uma restrição parcial no PostgreSQL garante que cada usuário tenha no máximo uma tarefa com status `in_progress`.

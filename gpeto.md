@@ -138,6 +138,7 @@ Os schemas abaixo foram confirmados para o MVP. O áudio é transcrito antes de 
 - O MVP é local e possui inicialmente um único usuário, Samuel. Ele acessa a aplicação com senha; apenas seu hash pode ser persistido e o valor em texto puro deve permanecer em variável de ambiente exclusiva do backend.
 - Depois da autenticação, a sessão de Samuel permanece ativa ao reiniciar o aplicativo até logout explícito. Tarefas, intervalos e demais ações registradas nunca são apagados pelo reinício do aplicativo.
 - Uma tarefa concluída é definitiva no MVP: ela não pode ser reaberta ou receber novos intervalos; para trabalho posterior, Samuel deve criar nova tarefa.
+- Samuel só pode ter uma tarefa em andamento por vez. Para iniciar ou retomar outra, deve pausar ou concluir a tarefa ativa.
 - Atualizar `progress.md` após cada tarefa significativa e `findings.md` quando houver descobertas ou restrições.
 
 ## Invariantes arquiteturais
@@ -174,3 +175,4 @@ Atualize este documento somente quando um schema, regra comportamental ou invari
 | 2026-08-24 | Navegação e orquestração definidas. | Conclusão da Camada 2 da arquitetura A.N.T. |
 | 2026-08-24 | Fundação executável da Camada 3 criada e validada. | Início da implementação com FastAPI, PostgreSQL, Alembic e Docker Compose. |
 | 2026-08-25 | Parser determinístico local instituído como interpretador inicial. | Permitir testes gratuitos e confiáveis antes da integração opcional de IA. |
+| 2026-08-26 | Regra de tarefa ativa única e semântica da visão diária definidas. | Manter cronômetros consistentes e tornar `GET /v1/day` útil ao cliente. |

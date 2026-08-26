@@ -9,6 +9,7 @@ from app.db import get_db
 from app.dependencies import get_current_user
 from app.models import User
 from app.schemas import DayResponse
+from app.services.day import get_day_summary
 
 router = APIRouter(tags=["day"])
 
@@ -19,5 +20,4 @@ def get_day(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> DayResponse:
-    # A consulta será preenchida junto dos serviços de tarefas e intervalos.
-    return DayResponse(date=requested_date or date.today())
+    return get_day_summary(db, user, requested_date)

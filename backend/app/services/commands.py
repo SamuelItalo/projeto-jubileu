@@ -65,6 +65,11 @@ def _apply_action(db: Session, user: User, action: ParsedAction) -> Task | Assis
     if action.type == "start_task":
         if task.status != "pending":
             raise HTTPException(status.HTTP_409_CONFLICT, detail={"code": "invalid_state"})
+        active_task = db.scalar(
+            select(Task).where(Task.user_id == user.id, Task.status == "in_progress", Task.id != task.id)
+        )
+        if active_task is not None:
+            raise HTTPException(status.HTTP_409_CONFLICT, detail={"code": "invalid_state"})
         task.status = "in_progress"
         task.started_at = task.started_at or now
         db.add(TaskTimeInterval(task_id=task.id, started_at=now))
@@ -78,6 +83,11 @@ def _apply_action(db: Session, user: User, action: ParsedAction) -> Task | Assis
         task.status = "paused"
     elif action.type == "resume_task":
         if task.status != "paused":
+            raise HTTPException(status.HTTP_409_CONFLICT, detail={"code": "invalid_state"})
+        active_task = db.scalar(
+            select(Task).where(Task.user_id == user.id, Task.status == "in_progress", Task.id != task.id)
+        )
+        if active_task is not None:
             raise HTTPException(status.HTTP_409_CONFLICT, detail={"code": "invalid_state"})
         task.status = "in_progress"
         db.add(TaskTimeInterval(task_id=task.id, started_at=now))
@@ -261,4 +271,3 @@ def process_command(db: Session, user: User, payload: VoiceCommandRequest) -> As
         tasks=[_task_response(db, task) for task in affected],
     )
     return _store_response(db, request, response)
-

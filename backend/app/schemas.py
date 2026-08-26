@@ -59,3 +59,4 @@ class DayResponse(BaseModel):
     date: date
     tasks: list[TaskResponse] = []
     active_task: TaskResponse | None = None
+    total_duration_seconds: int = 0

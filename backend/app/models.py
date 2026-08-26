@@ -48,6 +48,7 @@ class Task(Base):
     __table_args__ = (
         CheckConstraint("status IN ('pending', 'in_progress', 'paused', 'completed')", name="ck_tasks_status"),
         Index("ix_tasks_user_status", "user_id", "status"),
+        Index("uq_tasks_one_active_per_user", "user_id", unique=True, postgresql_where=text("status = 'in_progress'")),
     )
 
     id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -141,4 +142,3 @@ class PendingAction(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     resolution_request_id: Mapped[UUID | None] = mapped_column(ForeignKey("voice_requests.request_id"))
-

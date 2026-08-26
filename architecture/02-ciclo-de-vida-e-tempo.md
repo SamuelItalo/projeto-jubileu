@@ -23,6 +23,8 @@ Manter estados e duração de cada tarefa consistentes, auditáveis e calculados
 
 Todas as transições exigem um comando explícito do usuário e uma tarefa identificada sem ambiguidade. Transições não listadas são rejeitadas e não modificam dados.
 
+Há no máximo uma tarefa em `in_progress` por usuário. Portanto, iniciar ou retomar uma tarefa enquanto houver outra ativa é rejeitado com `409 invalid_state`; Samuel deve pausá-la ou concluí-la antes.
+
 ## Cálculo de duração
 
 `total_duration_seconds` é a soma de `ended_at - started_at` de todos os intervalos fechados. Um intervalo ativo pode ser exibido ao usuário com duração corrente calculada no instante da leitura, mas seu valor persistido só é consolidado ao fechar o intervalo. Datas devem ser armazenadas com fuso ou normalizadas em UTC, preservando o fuso informado para exibição.
@@ -30,6 +32,7 @@ Todas as transições exigem um comando explícito do usuário e uma tarefa iden
 ## Invariantes
 
 - Uma tarefa não possui mais de um intervalo ativo.
+- Um usuário não possui mais de uma tarefa em `in_progress`.
 - `ended_at` nunca é anterior a `started_at`.
 - Uma tarefa `completed` não possui intervalo aberto.
 - Uma tarefa `completed` não pode ser reaberta, alterada para outro estado nem receber novo intervalo no MVP.
@@ -42,5 +45,6 @@ Todas as transições exigem um comando explícito do usuário e uma tarefa iden
 | --- | --- |
 | Pausar ou retomar tarefa sem alvo único | Pedir esclarecimento. |
 | Iniciar tarefa já `in_progress` | Rejeitar sem abrir outro intervalo. |
+| Iniciar ou retomar com outra tarefa ativa | Rejeitar sem alterar a tarefa atual. |
 | Pausar ou concluir sem intervalo aberto | Rejeitar a transição incompatível. |
 | Relógio do cliente inconsistente | Usar o horário do servidor para registrar transições; preservar `occurred_at` como contexto da solicitação. |
