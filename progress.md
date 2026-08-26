@@ -72,3 +72,4 @@
 - Validação concluída: 15 testes automatizados passaram; contêineres saudáveis, Alembic em `20260826_0002 (head)` e consulta autenticada de 2026-08-25 retornou a tarefa de teste com 262 segundos.
 - Criado o cliente Flutter Linux em `frontend/`: login, restauração de sessão no armazenamento seguro, visão diária, cronômetro local de exibição, comandos por texto e confirmação/cancelamento vinculados ao contexto opaco do backend.
 - `flutter analyze` e o teste de widget passaram. A compilação Linux permanece pendente somente de `libsecret-1-dev`, dependência de desenvolvimento exigida pelo armazenamento seguro do Linux; a instalação requer senha local de `sudo`.
+- Após a instalação de `libsecret-1-dev`, a compilação Linux foi concluída com sucesso em `frontend/build/linux/x64/debug/bundle/jubileu_app`. API e banco permaneceram saudáveis, e o aplicativo foi iniciado no desktop local. A Camada 3 — implementação está concluída.

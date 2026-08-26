@@ -109,3 +109,4 @@
 
 - `flutter_secure_storage` usa o serviço seguro do sistema no Linux e exige o pacote de desenvolvimento `libsecret-1-dev` para compilar. Não é uma dependência do backend.
 - A interface usa o token apenas em memória para chamadas HTTP e o persiste no cofre seguro; mensagens e telas não exibem esse token.
+- Com `libsecret-1-dev` instalado, o bundle Linux do Flutter compilou e iniciou normalmente. Uma limpeza do cache (`flutter clean`) foi necessária para descartar um prefixo CMake antigo apontando para `/usr/local`.
