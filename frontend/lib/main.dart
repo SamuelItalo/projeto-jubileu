@@ -8,6 +8,7 @@ import 'api_client.dart';
 import 'app_theme.dart';
 import 'models.dart';
 import 'session_store.dart';
+import 'speech_output.dart';
 import 'voice_capture.dart';
 
 void main() => runApp(const JubileuApp());
@@ -238,6 +239,7 @@ class DayPage extends StatefulWidget {
 
 class _DayPageState extends State<DayPage> {
   final _command = TextEditingController();
+  final _speech = SpeechOutput();
   final _voice = VoiceCapture();
   DayData? _day;
   DateTime _selectedDate = DateTime.now();
@@ -280,6 +282,7 @@ class _DayPageState extends State<DayPage> {
       }
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.message);
+      unawaited(_speech.speak(error.message));
     }
   }
 
@@ -300,6 +303,7 @@ class _DayPageState extends State<DayPage> {
       });
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.message);
+      unawaited(_speech.speak(error.message));
     } finally {
       if (mounted) setState(() => _transcribing = false);
     }
@@ -350,9 +354,17 @@ class _DayPageState extends State<DayPage> {
             : result.clarificationQuestion ?? result.message;
         _command.clear();
       });
+      unawaited(
+        _speech.speak(
+          result.requiresConfirmation
+              ? 'Entendi a criação da tarefa. Confirma?'
+              : result.clarificationQuestion ?? result.message,
+        ),
+      );
       await _loadDay();
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.message);
+      unawaited(_speech.speak(error.message));
     } finally {
       if (mounted) setState(() => _sending = false);
     }
@@ -370,6 +382,15 @@ class _DayPageState extends State<DayPage> {
   void _changeDay(int days) {
     setState(() => _selectedDate = _selectedDate.add(Duration(days: days)));
     _loadDay();
+  }
+
+  Future<void> _testSpeech() async {
+    if (_recording || _transcribing) return;
+    setState(() {
+      _error = null;
+      _notice = 'Teste de voz enviado para a saída de áudio do sistema.';
+    });
+    await _speech.speak('Olá Samuel. A voz local do Jubileu está pronta.');
   }
 
   KeyEventResult _handleVoiceShortcut(FocusNode _, KeyEvent event) {
@@ -521,6 +542,7 @@ class _DayPageState extends State<DayPage> {
                             onSend: () => _send(_command.text),
                             onVoiceStart: _startVoice,
                             onVoiceStop: _stopVoice,
+                            onTestSpeech: _testSpeech,
                           ),
                           const SizedBox(height: 30),
                           Row(
@@ -830,6 +852,7 @@ class _CommandComposer extends StatelessWidget {
     required this.onSend,
     required this.onVoiceStart,
     required this.onVoiceStop,
+    required this.onTestSpeech,
   });
   final TextEditingController controller;
   final bool sending;
@@ -838,6 +861,7 @@ class _CommandComposer extends StatelessWidget {
   final VoidCallback onSend;
   final Future<void> Function() onVoiceStart;
   final Future<void> Function() onVoiceStop;
+  final Future<void> Function() onTestSpeech;
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
@@ -845,9 +869,21 @@ class _CommandComposer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'REGISTRAR AGORA',
-            style: Theme.of(context).textTheme.titleMedium,
+          Row(
+            children: [
+              Text(
+                'REGISTRAR AGORA',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: sending || recording || transcribing
+                    ? null
+                    : onTestSpeech,
+                icon: const Icon(Icons.volume_up_outlined, size: 17),
+                label: const Text('Testar voz'),
+              ),
+            ],
           ),
           const SizedBox(height: 4),
           const Text(

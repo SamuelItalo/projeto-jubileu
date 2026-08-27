@@ -116,3 +116,4 @@
 - O dispositivo padrão de entrada é `alsa_input.pci-0000_00_1f.3.analog-stereo` no PipeWire, correspondente ao codec analógico do notebook. Fones P3 e processamento Easy Effects continuam compatíveis enquanto essa fonte permanecer selecionada pelo sistema.
 - O modelo Vosk compacto em português atende ao primeiro teste local com baixo consumo, mas sua precisão deve ser avaliada por Samuel em comandos reais antes de qualquer ajuste de vocabulário ou troca de modelo.
 - No primeiro uso real, Vosk reconheceu frases aproximadas mas perdeu palavras de intenção como `criar`. Por isso o ponto de confirmação de texto foi movido para antes do envio ao parser; esse é um controle de confiabilidade, não uma mudança de regra de negócio.
+- O ambiente Linux já possui `spd-say` (Speech Dispatcher), capaz de sintetizar fala local. A integração usa `pt-BR` e invoca o processo apenas para respostas relevantes; não requer modelo de IA, rede, token ou persistência adicional.

@@ -85,3 +85,4 @@
 - Corrigida a prioridade visual de confirmação: quando uma criação estiver pendente, o cartão com os botões “Confirmar” e “Cancelar” é exibido antes de mensagens informativas.
 - Adicionado atalho de teclado local `F8`: enquanto o Jubileu estiver em foco, pressionar e segurar inicia a gravação; soltar encerra e inicia a transcrição. A transcrição continua exigindo revisão e o fluxo de confirmação para criar tarefas permanece obrigatório.
 - Ajustado o cartão de confirmação para o dashboard escuro: superfície grafite translúcida com desfoque, borda lilás, texto de alto contraste e botões de confirmação/cancelamento legíveis.
+- Implementada a resposta por voz local no Flutter Linux usando `spd-say`/Speech Dispatcher, já disponível no sistema. O Jubileu fala pedidos de confirmação, respostas de comandos, esclarecimentos e erros de execução; a tela permanece a fonte visual de confirmação. Incluído o botão “Testar voz”, sem criar ou alterar tarefas.
