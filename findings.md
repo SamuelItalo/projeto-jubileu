@@ -113,3 +113,5 @@
 - As observações já eram persistidas corretamente em `task_notes`; a lacuna estava somente no contrato de leitura diária e na interface. Não foi necessária migração de banco.
 - A interface de produtividade não precisa de imagens externas para parecer refinada: contraste de foco, espaçamento, tipografia leve, superfícies e movimento breve atendem melhor ao fluxo local e preservam rapidez de execução.
 - As referências de Samuel convergem em dois padrões úteis: entrada limpa e centrada, e dashboard desktop com barra lateral, cabeçalho objetivo e dados organizados em superfícies compactas. A implementação adotou esses padrões como inspiração, sem incorporar ou reproduzir as imagens.
+- O dispositivo padrão de entrada é `alsa_input.pci-0000_00_1f.3.analog-stereo` no PipeWire, correspondente ao codec analógico do notebook. Fones P3 e processamento Easy Effects continuam compatíveis enquanto essa fonte permanecer selecionada pelo sistema.
+- O modelo Vosk compacto em português atende ao primeiro teste local com baixo consumo, mas sua precisão deve ser avaliada por Samuel em comandos reais antes de qualquer ajuste de vocabulário ou troca de modelo.

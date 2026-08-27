@@ -4,4 +4,4 @@ psycopg[binary]>=3.2,<4.0
 alembic>=1.14,<2.0
 pydantic-settings>=2.6,<3.0
 pwdlib[argon2]>=0.2,<1.0
-
+vosk>=0.3.45,<0.4

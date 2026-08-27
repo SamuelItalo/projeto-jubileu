@@ -8,6 +8,12 @@ A fundação do backend e o primeiro cliente Flutter da Camada 3 estão prontos:
 
 O interpretador inicial é local, determinístico e gratuito. Ele não chama nenhum serviço de IA.
 
+## Comando por voz local
+
+O cliente Linux também possui o botão **Segure para falar**. Mantenha-o pressionado enquanto dita um comando em português e solte ao terminar. O áudio é gravado apenas durante o toque, transcrito localmente por Vosk e apagado em seguida; nenhum áudio ou texto é enviado a serviços externos.
+
+O primeiro início baixa/usa o modelo local em `models/`, que não é versionado pelo Git. O microfone padrão do PipeWire é usado; se o fone P3 ou Easy Effects mudar a fonte, ajuste-a nas configurações de som do sistema e tente novamente.
+
 ## Comandos disponíveis
 
 Use um comando por vez, ou separe criações por `;`:

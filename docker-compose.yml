@@ -18,6 +18,8 @@ services:
     env_file: .env
     environment:
       DATABASE_HOST: db
+    volumes:
+      - ./models:/models:ro
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:

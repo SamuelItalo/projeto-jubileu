@@ -21,6 +21,10 @@ class SessionInfoResponse(BaseModel):
     username: str
 
 
+class TranscriptionResponse(BaseModel):
+    transcript: str
+
+
 class ConfirmationContext(BaseModel):
     group_id: UUID
     action_id: UUID | None = None

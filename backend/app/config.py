@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     app_allow_insecure_test_auth: bool = False
     command_interpreter: str = "deterministic"
     openai_api_key: str | None = None
+    vosk_model_path: str = "/models/vosk-model-small-pt-0.3"
 
     @model_validator(mode="after")
     def validate_security(self) -> "Settings":

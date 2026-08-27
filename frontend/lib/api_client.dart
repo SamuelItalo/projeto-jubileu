@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:uuid/uuid.dart';
 
 import 'config.dart';
@@ -76,6 +78,21 @@ class ApiClient {
       }),
     );
     return CommandResult.fromJson(_decode(response));
+  }
+
+  Future<String> transcribe(File audio) async {
+    final request = http.MultipartRequest('POST', _uri('/transcriptions'));
+    request.headers.addAll(_headers);
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'audio',
+        audio.path,
+        contentType: MediaType('audio', 'wav'),
+      ),
+    );
+    final streamed = await request.send();
+    final response = await http.Response.fromStream(streamed);
+    return _decode(response)['transcript'] as String;
   }
 
   Future<Map<String, dynamic>> _authorizedGet(

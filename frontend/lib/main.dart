@@ -6,6 +6,7 @@ import 'api_client.dart';
 import 'app_theme.dart';
 import 'models.dart';
 import 'session_store.dart';
+import 'voice_capture.dart';
 
 void main() => runApp(const JubileuApp());
 
@@ -235,6 +236,7 @@ class DayPage extends StatefulWidget {
 
 class _DayPageState extends State<DayPage> {
   final _command = TextEditingController();
+  final _voice = VoiceCapture();
   DayData? _day;
   DateTime _selectedDate = DateTime.now();
   DateTime? _loadedAt;
@@ -243,6 +245,8 @@ class _DayPageState extends State<DayPage> {
   String? _error;
   bool _loading = true;
   bool _sending = false;
+  bool _recording = false;
+  bool _transcribing = false;
   late final Timer _ticker;
   @override
   void initState() {
@@ -257,7 +261,45 @@ class _DayPageState extends State<DayPage> {
   void dispose() {
     _ticker.cancel();
     _command.dispose();
+    _voice.dispose();
     super.dispose();
+  }
+
+  Future<void> _startVoice() async {
+    if (_sending || _transcribing || _recording) return;
+    try {
+      await _voice.start();
+      if (mounted) {
+        setState(() {
+          _recording = true;
+          _notice = 'Ouvindo… solte quando terminar.';
+        });
+      }
+    } on ApiException catch (error) {
+      if (mounted) setState(() => _error = error.message);
+    }
+  }
+
+  Future<void> _stopVoice() async {
+    if (!_recording) return;
+    setState(() {
+      _recording = false;
+      _transcribing = true;
+      _notice = 'Transcrevendo localmente…';
+    });
+    try {
+      final transcript = await _voice.stopAndTranscribe(widget.api);
+      if (!mounted) return;
+      setState(() {
+        _command.text = transcript;
+        _notice = 'Entendi: “$transcript”';
+      });
+      await _send(transcript);
+    } on ApiException catch (error) {
+      if (mounted) setState(() => _error = error.message);
+    } finally {
+      if (mounted) setState(() => _transcribing = false);
+    }
   }
 
   Future<void> _loadDay() async {
@@ -450,7 +492,11 @@ class _DayPageState extends State<DayPage> {
                         _CommandComposer(
                           controller: _command,
                           sending: _sending,
+                          recording: _recording,
+                          transcribing: _transcribing,
                           onSend: () => _send(_command.text),
+                          onVoiceStart: _startVoice,
+                          onVoiceStop: _stopVoice,
                         ),
                         const SizedBox(height: 30),
                         Row(
@@ -754,11 +800,19 @@ class _CommandComposer extends StatelessWidget {
   const _CommandComposer({
     required this.controller,
     required this.sending,
+    required this.recording,
+    required this.transcribing,
     required this.onSend,
+    required this.onVoiceStart,
+    required this.onVoiceStop,
   });
   final TextEditingController controller;
   final bool sending;
+  final bool recording;
+  final bool transcribing;
   final VoidCallback onSend;
+  final Future<void> Function() onVoiceStart;
+  final Future<void> Function() onVoiceStop;
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
@@ -772,7 +826,7 @@ class _CommandComposer extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           const Text(
-            'Escreva naturalmente. O Jubileu interpreta e pede confirmação quando necessário.',
+            'Escreva ou segure o microfone. O áudio é transcrito neste computador.',
           ),
           const SizedBox(height: 12),
           TextField(
@@ -789,18 +843,62 @@ class _CommandComposer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton.icon(
-              onPressed: sending ? null : onSend,
-              icon: sending
-                  ? const SizedBox.square(
-                      dimension: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.arrow_upward_rounded),
-              label: const Text('Registrar'),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Listener(
+                onPointerDown: sending || transcribing
+                    ? null
+                    : (_) => onVoiceStart(),
+                onPointerUp: recording ? (_) => onVoiceStop() : null,
+                onPointerCancel: recording ? (_) => onVoiceStop() : null,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 11,
+                  ),
+                  decoration: BoxDecoration(
+                    color: recording
+                        ? const Color(0xFFB94A57)
+                        : JubileuPalette.panelRaised,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: recording
+                          ? const Color(0xFFFF8E9A)
+                          : JubileuPalette.line,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        recording ? Icons.mic_rounded : Icons.mic_none_rounded,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        transcribing
+                            ? 'Transcrevendo…'
+                            : recording
+                            ? 'Gravando… solte'
+                            : 'Segure para falar',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              FilledButton.icon(
+                onPressed: sending || transcribing ? null : onSend,
+                icon: sending
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.arrow_upward_rounded),
+                label: const Text('Registrar'),
+              ),
+            ],
           ),
         ],
       ),
