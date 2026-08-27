@@ -12,7 +12,13 @@ O interpretador inicial é local, determinístico e gratuito. Ele não chama nen
 
 O cliente Linux também possui o botão **Segure para falar**. Mantenha-o pressionado enquanto dita um comando em português e solte ao terminar. O áudio é gravado apenas durante o toque, transcrito localmente por Vosk e apagado em seguida; nenhum áudio ou texto é enviado a serviços externos.
 
-O primeiro início baixa/usa o modelo local em `models/`, que não é versionado pelo Git. O microfone padrão do PipeWire é usado; se o fone P3 ou Easy Effects mudar a fonte, ajuste-a nas configurações de som do sistema e tente novamente.
+O modelo local fica em `models/`, que não é versionado pelo Git. O microfone padrão do PipeWire é usado; se o fone P3 ou Easy Effects mudar a fonte, ajuste-a nas configurações de som do sistema e tente novamente.
+
+## Resposta por voz local
+
+O Jubileu usa preferencialmente Piper com a voz neural local pt-BR `faber-medium`; não há transmissão de texto, áudio ou uso de serviços de IA na nuvem. Os arquivos do mecanismo estão no ambiente local `.venv/` e a voz está em `models/piper/`, ambos fora do Git. Se eles não estiverem disponíveis, o aplicativo usa `spd-say` como reserva.
+
+Na tela principal, **Testar voz** reproduz uma frase sem criar ou alterar tarefas. A fala também responde a confirmações, resultados, esclarecimentos e erros relevantes.
 
 ## Comandos disponíveis
 
