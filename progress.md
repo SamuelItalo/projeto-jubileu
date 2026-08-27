@@ -86,3 +86,4 @@
 - Adicionado atalho de teclado local `F8`: enquanto o Jubileu estiver em foco, pressionar e segurar inicia a gravação; soltar encerra e inicia a transcrição. A transcrição continua exigindo revisão e o fluxo de confirmação para criar tarefas permanece obrigatório.
 - Ajustado o cartão de confirmação para o dashboard escuro: superfície grafite translúcida com desfoque, borda lilás, texto de alto contraste e botões de confirmação/cancelamento legíveis.
 - Implementada a resposta por voz local no Flutter Linux usando `spd-say`/Speech Dispatcher, já disponível no sistema. O Jubileu fala pedidos de confirmação, respostas de comandos, esclarecimentos e erros de execução; a tela permanece a fonte visual de confirmação. Incluído o botão “Testar voz”, sem criar ou alterar tarefas.
+- Tornada a captura do atalho `F8` independente do foco dos campos e botões: o aplicativo agora registra a tecla diretamente pelo `HardwareKeyboard` enquanto a janela do Jubileu estiver em foco.
