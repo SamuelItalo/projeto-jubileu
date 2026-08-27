@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'api_client.dart';
 import 'app_theme.dart';
@@ -247,6 +248,7 @@ class _DayPageState extends State<DayPage> {
   bool _sending = false;
   bool _recording = false;
   bool _transcribing = false;
+  bool _f8Held = false;
   late final Timer _ticker;
   @override
   void initState() {
@@ -369,173 +371,193 @@ class _DayPageState extends State<DayPage> {
     _loadDay();
   }
 
+  KeyEventResult _handleVoiceShortcut(FocusNode _, KeyEvent event) {
+    if (event.logicalKey != LogicalKeyboardKey.f8) {
+      return KeyEventResult.ignored;
+    }
+
+    if (event is KeyDownEvent && !_f8Held) {
+      _f8Held = true;
+      unawaited(_startVoice());
+    } else if (event is KeyUpEvent) {
+      _f8Held = false;
+      unawaited(_stopVoice());
+    }
+    return KeyEventResult.handled;
+  }
+
   @override
   Widget build(BuildContext context) {
     final day = _day;
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Row(
-          children: [
-            JubileuMark(small: true),
-            SizedBox(width: 10),
-            Text('Jubileu'),
+    return Focus(
+      autofocus: true,
+      onKeyEvent: _handleVoiceShortcut,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          title: const Row(
+            children: [
+              JubileuMark(small: true),
+              SizedBox(width: 10),
+              Text('Jubileu'),
+            ],
+          ),
+          actions: [
+            IconButton(
+              onPressed: _loadDay,
+              tooltip: 'Atualizar',
+              icon: const Icon(Icons.refresh),
+            ),
+            TextButton.icon(
+              onPressed: widget.onLogout,
+              icon: const Icon(Icons.logout),
+              label: const Text('Sair'),
+            ),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: _loadDay,
-            tooltip: 'Atualizar',
-            icon: const Icon(Icons.refresh),
-          ),
-          TextButton.icon(
-            onPressed: widget.onLogout,
-            icon: const Icon(Icons.logout),
-            label: const Text('Sair'),
-          ),
-        ],
-      ),
-      body: AppCanvas(
-        child: SafeArea(
-          child: _DashboardFrame(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1080),
-                child: RefreshIndicator(
-                  onRefresh: _loadDay,
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Seu foco, ${widget.username}.',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall,
-                                ),
-                                const SizedBox(height: 6),
-                                const Text(
-                                  'Escolha o que importa e deixe o tempo contar a história.',
-                                ),
-                              ],
-                            ),
-                          ),
-                          const _StatusSeal(),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
-                      _DateNavigator(
-                        date: _selectedDate,
-                        onPrevious: () => _changeDay(-1),
-                        onNext: () => _changeDay(1),
-                        onToday: () {
-                          setState(() => _selectedDate = DateTime.now());
-                          _loadDay();
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 220),
-                        child: _error != null
-                            ? _MessageCard(
-                                key: const ValueKey('error'),
-                                message: _error!,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .errorContainer,
-                              )
-                            : _confirmation != null
-                            ? _ConfirmationCard(
-                                key: const ValueKey('confirmation'),
-                                onConfirm: () => _send(
-                                  'confirmo',
-                                  confirmation: _confirmation,
-                                ),
-                                onCancel: () => _send(
-                                  'cancelo',
-                                  confirmation: _confirmation,
-                                ),
-                              )
-                            : _notice != null
-                            ? _MessageCard(
-                                key: const ValueKey('notice'),
-                                message: _notice!,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .secondaryContainer,
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      if (_error != null ||
-                          _notice != null ||
-                          _confirmation != null)
-                        const SizedBox(height: 12),
-                      if (_loading && day == null)
-                        const Padding(
-                          padding: EdgeInsets.all(48),
-                          child: Center(child: CircularProgressIndicator()),
-                        )
-                      else ...[
-                        _ActiveCard(
-                          task: day?.activeTask,
-                          activeSeconds: _activeSeconds,
-                          daySeconds: _daySeconds,
-                          onPause: day?.activeTask == null
-                              ? null
-                              : () => _send('pausar ${day!.activeTask!.title}'),
-                        ),
-                        const SizedBox(height: 18),
-                        _CommandComposer(
-                          controller: _command,
-                          sending: _sending,
-                          recording: _recording,
-                          transcribing: _transcribing,
-                          onSend: () => _send(_command.text),
-                          onVoiceStart: _startVoice,
-                          onVoiceStop: _stopVoice,
-                        ),
-                        const SizedBox(height: 30),
+        body: AppCanvas(
+          child: SafeArea(
+            child: _DashboardFrame(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1080),
+                  child: RefreshIndicator(
+                    onRefresh: _loadDay,
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                      children: [
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              'Tarefas',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const Spacer(),
-                            Text(
-                              '${day?.tasks.length ?? 0} no dia',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        if (day == null || day.tasks.isEmpty)
-                          const _EmptyTasks()
-                        else
-                          ...day.tasks.map(
-                            (task) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: _TaskCard(
-                                task: task,
-                                onAction:
-                                    task.status == 'pending' &&
-                                        day.activeTask == null
-                                    ? () => _send('iniciar ${task.title}')
-                                    : task.status == 'paused' &&
-                                          day.activeTask == null
-                                    ? () => _send('retomar ${task.title}')
-                                    : null,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Seu foco, ${widget.username}.',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  const Text(
+                                    'Escolha o que importa e deixe o tempo contar a história.',
+                                  ),
+                                ],
                               ),
                             ),
+                            const _StatusSeal(),
+                          ],
+                        ),
+                        const SizedBox(height: 28),
+                        _DateNavigator(
+                          date: _selectedDate,
+                          onPrevious: () => _changeDay(-1),
+                          onNext: () => _changeDay(1),
+                          onToday: () {
+                            setState(() => _selectedDate = DateTime.now());
+                            _loadDay();
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 220),
+                          child: _error != null
+                              ? _MessageCard(
+                                  key: const ValueKey('error'),
+                                  message: _error!,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .errorContainer,
+                                )
+                              : _confirmation != null
+                              ? _ConfirmationCard(
+                                  key: const ValueKey('confirmation'),
+                                  onConfirm: () => _send(
+                                    'confirmo',
+                                    confirmation: _confirmation,
+                                  ),
+                                  onCancel: () => _send(
+                                    'cancelo',
+                                    confirmation: _confirmation,
+                                  ),
+                                )
+                              : _notice != null
+                              ? _MessageCard(
+                                  key: const ValueKey('notice'),
+                                  message: _notice!,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondaryContainer,
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        if (_error != null ||
+                            _notice != null ||
+                            _confirmation != null)
+                          const SizedBox(height: 12),
+                        if (_loading && day == null)
+                          const Padding(
+                            padding: EdgeInsets.all(48),
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        else ...[
+                          _ActiveCard(
+                            task: day?.activeTask,
+                            activeSeconds: _activeSeconds,
+                            daySeconds: _daySeconds,
+                            onPause: day?.activeTask == null
+                                ? null
+                                : () =>
+                                      _send('pausar ${day!.activeTask!.title}'),
                           ),
+                          const SizedBox(height: 18),
+                          _CommandComposer(
+                            controller: _command,
+                            sending: _sending,
+                            recording: _recording,
+                            transcribing: _transcribing,
+                            onSend: () => _send(_command.text),
+                            onVoiceStart: _startVoice,
+                            onVoiceStop: _stopVoice,
+                          ),
+                          const SizedBox(height: 30),
+                          Row(
+                            children: [
+                              Text(
+                                'Tarefas',
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const Spacer(),
+                              Text(
+                                '${day?.tasks.length ?? 0} no dia',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          if (day == null || day.tasks.isEmpty)
+                            const _EmptyTasks()
+                          else
+                            ...day.tasks.map(
+                              (task) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: _TaskCard(
+                                  task: task,
+                                  onAction:
+                                      task.status == 'pending' &&
+                                          day.activeTask == null
+                                      ? () => _send('iniciar ${task.title}')
+                                      : task.status == 'paused' &&
+                                            day.activeTask == null
+                                      ? () => _send('retomar ${task.title}')
+                                      : null,
+                                ),
+                              ),
+                            ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -828,7 +850,7 @@ class _CommandComposer extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           const Text(
-            'Escreva ou segure o microfone. O áudio é transcrito neste computador.',
+            'Escreva, segure o microfone ou use F8. O áudio é transcrito neste computador.',
           ),
           const SizedBox(height: 12),
           TextField(
@@ -884,7 +906,7 @@ class _CommandComposer extends StatelessWidget {
                             ? 'Transcrevendo…'
                             : recording
                             ? 'Gravando… solte'
-                            : 'Segure para falar',
+                            : 'Segure para falar (F8)',
                       ),
                     ],
                   ),
