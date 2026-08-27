@@ -556,7 +556,7 @@ class _TaskCard extends StatelessWidget {
   final VoidCallback? onAction;
   @override
   Widget build(BuildContext context) => Card(
-    child: ListTile(
+    child: ExpansionTile(
       leading: Icon(_statusIcon(task.status)),
       title: Text(task.title),
       subtitle: Text(
@@ -573,6 +573,56 @@ class _TaskCard extends StatelessWidget {
                     : Icons.play_arrow,
               ),
             ),
+      children: [
+        const Divider(height: 1),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+          child: task.notes.isEmpty
+              ? const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Nenhuma observação registrada.'),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Observações',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    ...task.notes.map(
+                      (note) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(top: 2, right: 8),
+                              child: Icon(Icons.chat_bubble_outline, size: 16),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(note.content),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _noteDate(note.createdAt),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      ],
     ),
   );
 }
@@ -644,6 +694,9 @@ String _duration(int seconds) {
   final remaining = seconds % 60;
   return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${remaining.toString().padLeft(2, '0')}';
 }
+
+String _noteDate(DateTime value) =>
+    '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')} às ${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}';
 
 IconData _statusIcon(String status) => switch (status) {
   'pending' => Icons.radio_button_unchecked,

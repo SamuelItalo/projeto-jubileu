@@ -24,11 +24,11 @@ Todos os caminhos usam o prefixo `/v1` e JSON. Com exceção de `POST /auth/logi
 | `GET /auth/session` | nenhum | Confirma que a sessão persistida continua válida. |
 | `POST /auth/logout` | nenhum | Revoga somente a sessão atual; não remove dados. |
 | `POST /commands` | `VoiceCommandRequest` | Processa transcrição, cria ação pendente quando exigido e devolve `AssistantResponse`. |
-| `GET /day?date=YYYY-MM-DD` | data opcional no fuso do usuário | Devolve tarefas, tarefa ativa e `total_duration_seconds` do dia; não altera dados. |
+| `GET /day?date=YYYY-MM-DD` | data opcional no fuso do usuário | Devolve tarefas, tarefa ativa, duração diária e observações de cada tarefa; não altera dados. |
 
 Uma confirmação ou cancelamento por voz também usa `POST /commands`: o Flutter envia nova transcrição e o `confirmation_context` recebido previamente, contendo `group_id` e, opcionalmente, `action_id`. Não há endpoint que confirme uma ação sem fala explícita.
 
-Para `GET /day`, a data é interpretada em `user_preferences.timezone` (padrão `America/Recife`). A resposta inclui as tarefas abertas e as concluídas que foram criadas, concluídas ou tiveram algum intervalo sobreposto ao dia consultado. A duração diária é a soma apenas da parcela dos intervalos dentro desse dia, incluindo um intervalo aberto até o instante da leitura.
+Para `GET /day`, a data é interpretada em `user_preferences.timezone` (padrão `America/Recife`). A resposta inclui as tarefas abertas e as concluídas que foram criadas, concluídas ou tiveram algum intervalo sobreposto ao dia consultado. Cada tarefa inclui suas observações, em ordem cronológica, com conteúdo e horário de criação. A duração diária é a soma apenas da parcela dos intervalos dentro desse dia, incluindo um intervalo aberto até o instante da leitura.
 
 ## Modelo relacional
 

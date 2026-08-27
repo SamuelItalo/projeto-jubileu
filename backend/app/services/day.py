@@ -6,8 +6,8 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Task, TaskTimeInterval, User, UserPreference
-from app.schemas import DayResponse, TaskResponse
+from app.models import Task, TaskNote, TaskTimeInterval, User, UserPreference
+from app.schemas import DayResponse, TaskNoteResponse, TaskResponse
 
 
 def day_bounds(requested_date: date, timezone_name: str) -> tuple[datetime, datetime]:
@@ -30,9 +30,20 @@ def interval_seconds_in_window(
     return max(int((overlap_end - overlap_start).total_seconds()), 0)
 
 
-def _task_response(task: Task, intervals: list[TaskTimeInterval], now: datetime) -> TaskResponse:
+def _task_response(
+    task: Task,
+    intervals: list[TaskTimeInterval],
+    notes: list[TaskNote],
+    now: datetime,
+) -> TaskResponse:
     duration = sum(int(((interval.ended_at or now) - interval.started_at).total_seconds()) for interval in intervals)
-    return TaskResponse(id=task.id, title=task.title, status=task.status, total_duration_seconds=max(duration, 0))
+    return TaskResponse(
+        id=task.id,
+        title=task.title,
+        status=task.status,
+        total_duration_seconds=max(duration, 0),
+        notes=[TaskNoteResponse(content=note.content, created_at=note.created_at) for note in notes],
+    )
 
 
 def get_day_summary(db: Session, user: User, requested_date: date | None) -> DayResponse:
@@ -53,6 +64,15 @@ def get_day_summary(db: Session, user: User, requested_date: date | None) -> Day
     intervals_by_task: dict[object, list[TaskTimeInterval]] = {}
     for interval in intervals:
         intervals_by_task.setdefault(interval.task_id, []).append(interval)
+    notes = db.scalars(
+        select(TaskNote)
+        .join(Task, Task.id == TaskNote.task_id)
+        .where(Task.user_id == user.id)
+        .order_by(TaskNote.created_at)
+    ).all()
+    notes_by_task: dict[object, list[TaskNote]] = {}
+    for note in notes:
+        notes_by_task.setdefault(note.task_id, []).append(note)
 
     visible_tasks: list[TaskResponse] = []
     active_task: TaskResponse | None = None
@@ -69,7 +89,7 @@ def get_day_summary(db: Session, user: User, requested_date: date | None) -> Day
         is_visible = task.status != "completed" or created_in_day or completed_in_day or duration_in_day > 0
         if not is_visible:
             continue
-        response = _task_response(task, task_intervals, now)
+        response = _task_response(task, task_intervals, notes_by_task.get(task.id, []), now)
         visible_tasks.append(response)
         if task.status == "in_progress":
             active_task = response

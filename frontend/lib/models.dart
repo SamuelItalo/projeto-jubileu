@@ -4,6 +4,7 @@ class TaskData {
     required this.title,
     required this.status,
     required this.totalDurationSeconds,
+    required this.notes,
   });
 
   factory TaskData.fromJson(Map<String, dynamic> json) => TaskData(
@@ -11,12 +12,28 @@ class TaskData {
     title: json['title'] as String,
     status: json['status'] as String,
     totalDurationSeconds: json['total_duration_seconds'] as int,
+    notes: (json['notes'] as List<dynamic>? ?? [])
+        .map((item) => TaskNoteData.fromJson(item as Map<String, dynamic>))
+        .toList(),
   );
 
   final String id;
   final String title;
   final String status;
   final int totalDurationSeconds;
+  final List<TaskNoteData> notes;
+}
+
+class TaskNoteData {
+  const TaskNoteData({required this.content, required this.createdAt});
+
+  factory TaskNoteData.fromJson(Map<String, dynamic> json) => TaskNoteData(
+    content: json['content'] as String,
+    createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
+  );
+
+  final String content;
+  final DateTime createdAt;
 }
 
 class DayData {

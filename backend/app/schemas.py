@@ -42,6 +42,12 @@ class TaskResponse(BaseModel):
     title: str
     status: Literal["pending", "in_progress", "paused", "completed"]
     total_duration_seconds: int
+    notes: list["TaskNoteResponse"] = []
+
+
+class TaskNoteResponse(BaseModel):
+    content: str
+    created_at: datetime
 
 
 class AssistantResponse(BaseModel):
