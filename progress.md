@@ -77,5 +77,5 @@
 
 ## 2026-08-27
 
-- Iniciada a Fase 4 — Estilo. O cliente Flutter recebeu a direção visual “luxo discreto”: paleta marfim/verde floresta/dourado fosco, tipografia Ubuntu leve, superfícies com baixo contraste, maior hierarquia para foco e tempo, e transições curtas para troca de estado e mensagens.
+- Iniciada a Fase 4 — Estilo. Após referências visuais fornecidas por Samuel, o cliente Flutter passou a usar dashboard grafite com navegação lateral responsiva, acentos menta/lilás, tipografia Ubuntu leve, login claro com ilustração vetorial própria e transições curtas para troca de estado e mensagens.
 - Criado `frontend/STYLE.md` para registrar as decisões visuais. `flutter analyze`, teste de widget e compilação Linux passaram; aguarda-se apenas a validação visual de Samuel para encerrar a fase.

@@ -112,3 +112,4 @@
 - Com `libsecret-1-dev` instalado, o bundle Linux do Flutter compilou e iniciou normalmente. Uma limpeza do cache (`flutter clean`) foi necessária para descartar um prefixo CMake antigo apontando para `/usr/local`.
 - As observações já eram persistidas corretamente em `task_notes`; a lacuna estava somente no contrato de leitura diária e na interface. Não foi necessária migração de banco.
 - A interface de produtividade não precisa de imagens externas para parecer refinada: contraste de foco, espaçamento, tipografia leve, superfícies e movimento breve atendem melhor ao fluxo local e preservam rapidez de execução.
+- As referências de Samuel convergem em dois padrões úteis: entrada limpa e centrada, e dashboard desktop com barra lateral, cabeçalho objetivo e dados organizados em superfícies compactas. A implementação adotou esses padrões como inspiração, sem incorporar ou reproduzir as imagens.

@@ -80,7 +80,7 @@ class _JubileuAppState extends State<JubileuApp> {
   Widget build(BuildContext context) => MaterialApp(
     title: 'Jubileu',
     debugShowCheckedModeBanner: false,
-    theme: JubileuTheme.light(),
+    theme: JubileuTheme.dark(),
     home: AnimatedSwitcher(
       duration: const Duration(milliseconds: 380),
       child: _restoring
@@ -88,9 +88,7 @@ class _JubileuAppState extends State<JubileuApp> {
               key: ValueKey('loading'),
               body: AppCanvas(
                 child: Center(
-                  child: CircularProgressIndicator(
-                    color: JubileuPalette.forest,
-                  ),
+                  child: CircularProgressIndicator(color: JubileuPalette.mint),
                 ),
               ),
             )
@@ -142,9 +140,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: AppCanvas(
-      child: Center(
+  Widget build(BuildContext context) => Theme(
+    data: JubileuTheme.login(context),
+    child: Scaffold(
+      body: Container(
+        color: JubileuPalette.cream,
+        alignment: Alignment.center,
         child: TweenAnimationBuilder<double>(
           duration: const Duration(milliseconds: 560),
           curve: Curves.easeOutCubic,
@@ -154,25 +155,25 @@ class _LoginPageState extends State<LoginPage> {
             child: Opacity(opacity: value, child: child),
           ),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: const BoxConstraints(maxWidth: 430),
             child: Card(
               margin: const EdgeInsets.all(24),
               child: Padding(
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.all(22),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Center(child: JubileuMark()),
-                    const SizedBox(height: 16),
+                    const Center(child: LoginIllustration()),
+                    const SizedBox(height: 12),
                     Text(
-                      'Jubileu',
+                      'Bem-vindo ao\nJubileu',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     const Text(
-                      'Produtividade com presença, clareza e ritmo.',
+                      'Organize o seu trabalho com mais presença e menos ruído.',
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 28),
@@ -198,15 +199,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     const SizedBox(height: 20),
-                    FilledButton.icon(
+                    FilledButton(
                       onPressed: _loading ? null : _submit,
-                      icon: _loading
+                      child: _loading
                           ? const SizedBox.square(
                               dimension: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Icon(Icons.login),
-                      label: const Text('Entrar'),
+                          : const Text('Continuar'),
                     ),
                   ],
                 ),
@@ -353,138 +353,142 @@ class _DayPageState extends State<DayPage> {
       ),
       body: AppCanvas(
         child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1080),
-              child: RefreshIndicator(
-                onRefresh: _loadDay,
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Seu foco, ${widget.username}.',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall,
-                              ),
-                              const SizedBox(height: 6),
-                              const Text(
-                                'Escolha o que importa e deixe o tempo contar a história.',
-                              ),
-                            ],
-                          ),
-                        ),
-                        const _StatusSeal(),
-                      ],
-                    ),
-                    const SizedBox(height: 28),
-                    _DateNavigator(
-                      date: _selectedDate,
-                      onPrevious: () => _changeDay(-1),
-                      onNext: () => _changeDay(1),
-                      onToday: () {
-                        setState(() => _selectedDate = DateTime.now());
-                        _loadDay();
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 220),
-                      child: _error != null
-                          ? _MessageCard(
-                              key: const ValueKey('error'),
-                              message: _error!,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .errorContainer,
-                            )
-                          : _notice != null
-                          ? _MessageCard(
-                              key: const ValueKey('notice'),
-                              message: _notice!,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .secondaryContainer,
-                            )
-                          : _confirmation != null
-                          ? _ConfirmationCard(
-                              key: const ValueKey('confirmation'),
-                              onConfirm: () => _send(
-                                'confirmo',
-                                confirmation: _confirmation,
-                              ),
-                              onCancel: () =>
-                                  _send('cancelo', confirmation: _confirmation),
-                            )
-                          : const SizedBox.shrink(),
-                    ),
-                    if (_error != null ||
-                        _notice != null ||
-                        _confirmation != null)
-                      const SizedBox(height: 12),
-                    if (_loading && day == null)
-                      const Padding(
-                        padding: EdgeInsets.all(48),
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else ...[
-                      _ActiveCard(
-                        task: day?.activeTask,
-                        activeSeconds: _activeSeconds,
-                        daySeconds: _daySeconds,
-                        onPause: day?.activeTask == null
-                            ? null
-                            : () => _send('pausar ${day!.activeTask!.title}'),
-                      ),
-                      const SizedBox(height: 18),
-                      _CommandComposer(
-                        controller: _command,
-                        sending: _sending,
-                        onSend: () => _send(_command.text),
-                      ),
-                      const SizedBox(height: 30),
+          child: _DashboardFrame(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1080),
+                child: RefreshIndicator(
+                  onRefresh: _loadDay,
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                    children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            'Tarefas',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const Spacer(),
-                          Text(
-                            '${day?.tasks.length ?? 0} no dia',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      if (day == null || day.tasks.isEmpty)
-                        const _EmptyTasks()
-                      else
-                        ...day.tasks.map(
-                          (task) => Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: _TaskCard(
-                              task: task,
-                              onAction:
-                                  task.status == 'pending' &&
-                                      day.activeTask == null
-                                  ? () => _send('iniciar ${task.title}')
-                                  : task.status == 'paused' &&
-                                        day.activeTask == null
-                                  ? () => _send('retomar ${task.title}')
-                                  : null,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Seu foco, ${widget.username}.',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall,
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  'Escolha o que importa e deixe o tempo contar a história.',
+                                ),
+                              ],
                             ),
                           ),
+                          const _StatusSeal(),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      _DateNavigator(
+                        date: _selectedDate,
+                        onPrevious: () => _changeDay(-1),
+                        onNext: () => _changeDay(1),
+                        onToday: () {
+                          setState(() => _selectedDate = DateTime.now());
+                          _loadDay();
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        child: _error != null
+                            ? _MessageCard(
+                                key: const ValueKey('error'),
+                                message: _error!,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .errorContainer,
+                              )
+                            : _notice != null
+                            ? _MessageCard(
+                                key: const ValueKey('notice'),
+                                message: _notice!,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
+                              )
+                            : _confirmation != null
+                            ? _ConfirmationCard(
+                                key: const ValueKey('confirmation'),
+                                onConfirm: () => _send(
+                                  'confirmo',
+                                  confirmation: _confirmation,
+                                ),
+                                onCancel: () => _send(
+                                  'cancelo',
+                                  confirmation: _confirmation,
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      if (_error != null ||
+                          _notice != null ||
+                          _confirmation != null)
+                        const SizedBox(height: 12),
+                      if (_loading && day == null)
+                        const Padding(
+                          padding: EdgeInsets.all(48),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      else ...[
+                        _ActiveCard(
+                          task: day?.activeTask,
+                          activeSeconds: _activeSeconds,
+                          daySeconds: _daySeconds,
+                          onPause: day?.activeTask == null
+                              ? null
+                              : () => _send('pausar ${day!.activeTask!.title}'),
                         ),
+                        const SizedBox(height: 18),
+                        _CommandComposer(
+                          controller: _command,
+                          sending: _sending,
+                          onSend: () => _send(_command.text),
+                        ),
+                        const SizedBox(height: 30),
+                        Row(
+                          children: [
+                            Text(
+                              'Tarefas',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const Spacer(),
+                            Text(
+                              '${day?.tasks.length ?? 0} no dia',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        if (day == null || day.tasks.isEmpty)
+                          const _EmptyTasks()
+                        else
+                          ...day.tasks.map(
+                            (task) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: _TaskCard(
+                                task: task,
+                                onAction:
+                                    task.status == 'pending' &&
+                                        day.activeTask == null
+                                    ? () => _send('iniciar ${task.title}')
+                                    : task.status == 'paused' &&
+                                          day.activeTask == null
+                                    ? () => _send('retomar ${task.title}')
+                                    : null,
+                              ),
+                            ),
+                          ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -493,6 +497,107 @@ class _DayPageState extends State<DayPage> {
       ),
     );
   }
+}
+
+class _DashboardFrame extends StatelessWidget {
+  const _DashboardFrame({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => Row(
+      children: [
+        if (constraints.maxWidth >= 900) const _Sidebar(),
+        Expanded(child: child),
+      ],
+    ),
+  );
+}
+
+class _Sidebar extends StatelessWidget {
+  const _Sidebar();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 216,
+    margin: const EdgeInsets.fromLTRB(20, 12, 0, 20),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1E1E23),
+      border: Border.all(color: JubileuPalette.line),
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            JubileuMark(small: true),
+            SizedBox(width: 10),
+            Text('Jubileu', style: TextStyle(fontWeight: FontWeight.w500)),
+          ],
+        ),
+        const SizedBox(height: 38),
+        const _NavItem(
+          icon: Icons.grid_view_rounded,
+          label: 'Meu dia',
+          active: true,
+        ),
+        const _NavItem(icon: Icons.checklist_rounded, label: 'Registros'),
+        const _NavItem(icon: Icons.auto_graph_rounded, label: 'Insights'),
+        const Spacer(),
+        const Divider(color: JubileuPalette.line),
+        const SizedBox(height: 10),
+        Text(
+          'LOCAL • PRIVADO',
+          style: Theme.of(context).textTheme.labelLarge
+              ?.copyWith(color: JubileuPalette.muted),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Seus dados ficam neste computador.',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    ),
+  );
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    this.active = false,
+  });
+  final IconData icon;
+  final String label;
+  final bool active;
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.only(bottom: 6),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    decoration: BoxDecoration(
+      color: active ? JubileuPalette.panelRaised : Colors.transparent,
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Row(
+      children: [
+        Icon(
+          icon,
+          size: 18,
+          color: active ? JubileuPalette.mint : JubileuPalette.muted,
+        ),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: TextStyle(
+            color: active ? JubileuPalette.ink : JubileuPalette.muted,
+            fontWeight: active ? FontWeight.w500 : FontWeight.w300,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _DateNavigator extends StatelessWidget {
@@ -543,13 +648,13 @@ class _StatusSeal extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
     decoration: BoxDecoration(
-      color: JubileuPalette.forestSoft,
+      color: JubileuPalette.panelRaised,
       borderRadius: BorderRadius.circular(14),
     ),
     child: const Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.circle, size: 8, color: JubileuPalette.gold),
+        Icon(Icons.circle, size: 8, color: JubileuPalette.mint),
         SizedBox(width: 7),
         Text(
           'RITMO DIÁRIO',
@@ -581,14 +686,14 @@ class _ActiveCard extends StatelessWidget {
     curve: Curves.easeOutCubic,
     decoration: BoxDecoration(
       gradient: const LinearGradient(
-        colors: [JubileuPalette.forest, Color(0xFF205047)],
+        colors: [JubileuPalette.panelRaised, Color(0xFF303039)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       borderRadius: BorderRadius.circular(28),
       boxShadow: const [
         BoxShadow(
-          color: Color(0x35123B35),
+          color: Color(0x55000000),
           blurRadius: 28,
           offset: Offset(0, 14),
         ),
@@ -602,7 +707,7 @@ class _ActiveCard extends StatelessWidget {
           Text(
             task == null ? 'Nenhuma tarefa em andamento' : 'Em andamento agora',
             style: Theme.of(context).textTheme.labelLarge
-                ?.copyWith(color: JubileuPalette.gold),
+                ?.copyWith(color: JubileuPalette.lilac),
           ),
           const SizedBox(height: 8),
           Text(
@@ -633,7 +738,7 @@ class _ActiveCard extends StatelessWidget {
                 onPressed: onPause,
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: JubileuPalette.forest,
+                  foregroundColor: JubileuPalette.darkInk,
                 ),
                 icon: const Icon(Icons.pause_rounded),
                 label: const Text('Pausar'),
@@ -857,7 +962,7 @@ class _EmptyTasks extends StatelessWidget {
       padding: EdgeInsets.all(34),
       child: Column(
         children: [
-          Icon(Icons.spa_outlined, size: 30, color: JubileuPalette.gold),
+          Icon(Icons.spa_outlined, size: 30, color: JubileuPalette.lilac),
           SizedBox(height: 10),
           Text('Um dia livre para começar com intenção.'),
         ],
@@ -883,8 +988,8 @@ IconData _statusIcon(String status) => switch (status) {
   _ => Icons.check_circle_outline,
 };
 Color _statusColor(String status) => switch (status) {
-  'pending' => JubileuPalette.gold,
-  'in_progress' => JubileuPalette.forest,
+  'pending' => JubileuPalette.lilac,
+  'in_progress' => JubileuPalette.mint,
   'paused' => const Color(0xFF69756D),
   _ => const Color(0xFF3B7A57),
 };

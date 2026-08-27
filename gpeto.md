@@ -177,3 +177,4 @@ Atualize este documento somente quando um schema, regra comportamental ou invari
 | 2026-08-25 | Parser determinístico local instituído como interpretador inicial. | Permitir testes gratuitos e confiáveis antes da integração opcional de IA. |
 | 2026-08-26 | Regra de tarefa ativa única e semântica da visão diária definidas. | Manter cronômetros consistentes e tornar `GET /v1/day` útil ao cliente. |
 | 2026-08-27 | Direção visual “luxo discreto” aplicada ao cliente Flutter. | Início da Fase 4 — Estilo, com validação visual pendente do usuário. |
+| 2026-08-27 | Referências visuais do usuário incorporadas como direção de dashboard e entrada. | Ajustar a Fase 4 ao resultado esperado sem copiar imagens de terceiros. |
