@@ -9,7 +9,7 @@ void main() {
       MaterialApp(home: LoginPage(onLogin: (LoginData _) async {})),
     );
 
-    expect(find.text('Projeto Jubileu'), findsOneWidget);
+    expect(find.text('Jubileu'), findsOneWidget);
     expect(find.text('Entrar'), findsOneWidget);
   });
 }

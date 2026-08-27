@@ -74,3 +74,8 @@
 - `flutter analyze` e o teste de widget passaram. A compilação Linux permanece pendente somente de `libsecret-1-dev`, dependência de desenvolvimento exigida pelo armazenamento seguro do Linux; a instalação requer senha local de `sudo`.
 - Após a instalação de `libsecret-1-dev`, a compilação Linux foi concluída com sucesso em `frontend/build/linux/x64/debug/bundle/jubileu_app`. API e banco permaneceram saudáveis, e o aplicativo foi iniciado no desktop local. A Camada 3 — implementação está concluída.
 - A visão diária passou a incluir observações de cada tarefa. A interface Flutter as exibe ao expandir o cartão da tarefa; a validação autenticada confirmou a observação já registrada em `teste da interface`.
+
+## 2026-08-27
+
+- Iniciada a Fase 4 — Estilo. O cliente Flutter recebeu a direção visual “luxo discreto”: paleta marfim/verde floresta/dourado fosco, tipografia Ubuntu leve, superfícies com baixo contraste, maior hierarquia para foco e tempo, e transições curtas para troca de estado e mensagens.
+- Criado `frontend/STYLE.md` para registrar as decisões visuais. `flutter analyze`, teste de widget e compilação Linux passaram; aguarda-se apenas a validação visual de Samuel para encerrar a fase.

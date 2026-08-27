@@ -111,3 +111,4 @@
 - A interface usa o token apenas em memória para chamadas HTTP e o persiste no cofre seguro; mensagens e telas não exibem esse token.
 - Com `libsecret-1-dev` instalado, o bundle Linux do Flutter compilou e iniciou normalmente. Uma limpeza do cache (`flutter clean`) foi necessária para descartar um prefixo CMake antigo apontando para `/usr/local`.
 - As observações já eram persistidas corretamente em `task_notes`; a lacuna estava somente no contrato de leitura diária e na interface. Não foi necessária migração de banco.
+- A interface de produtividade não precisa de imagens externas para parecer refinada: contraste de foco, espaçamento, tipografia leve, superfícies e movimento breve atendem melhor ao fluxo local e preservam rapidez de execução.

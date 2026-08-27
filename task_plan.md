@@ -23,7 +23,7 @@
 - [x] A — Arquitetura: Camada 1 — POPs técnicos concluída em 2026-08-20.
 - [x] A — Arquitetura: Camada 2 — Navegação e orquestração concluída em 2026-08-24.
 - [x] A — Arquitetura: Camada 3 — Ferramentas e implementação concluída em 2026-08-26.
-- [ ] E — Estilo.
+- [ ] E — Estilo (implementado; aguardando validação visual do usuário).
 - [ ] G — Gatilho e implantação.
 
 ## Estado do blueprint

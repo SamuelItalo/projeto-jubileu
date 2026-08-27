@@ -4,7 +4,7 @@
 
 - **Protocolo:** V.L.A.E.G. — Visão, Link, Arquitetura, Estilo e Gatilho.
 - **Arquitetura:** A.N.T. — Arquitetura, Navegação e Ferramentas.
-- **Estado atual:** Fases 1 — Visão e 2 — Link concluídas. Na Fase 3 — Arquitetura, as Camadas 1 (POPs técnicos) e 2 (navegação e orquestração) estão concluídas; a Camada 3 — ferramentas e implementação está em andamento.
+- **Estado atual:** Fases 1 — Visão, 2 — Link e 3 — Arquitetura concluídas. A Fase 4 — Estilo está em validação visual do cliente antes do encerramento.
 - **Objetivo do projeto:** criar um assistente pessoal inteligente, orientado por voz, que acompanhe o trabalho do usuário, registre atividades, meça o tempo por tarefa e produza insights práticos de produtividade.
 
 ## Fonte de verdade e componentes
@@ -176,3 +176,4 @@ Atualize este documento somente quando um schema, regra comportamental ou invari
 | 2026-08-24 | Fundação executável da Camada 3 criada e validada. | Início da implementação com FastAPI, PostgreSQL, Alembic e Docker Compose. |
 | 2026-08-25 | Parser determinístico local instituído como interpretador inicial. | Permitir testes gratuitos e confiáveis antes da integração opcional de IA. |
 | 2026-08-26 | Regra de tarefa ativa única e semântica da visão diária definidas. | Manter cronômetros consistentes e tornar `GET /v1/day` útil ao cliente. |
+| 2026-08-27 | Direção visual “luxo discreto” aplicada ao cliente Flutter. | Início da Fase 4 — Estilo, com validação visual pendente do usuário. |
