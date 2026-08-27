@@ -339,10 +339,12 @@ class _DayPageState extends State<DayPage> {
       );
       if (!mounted) return;
       setState(() {
-        _notice = result.clarificationQuestion ?? result.message;
         _confirmation = result.requiresConfirmation
             ? result.confirmation
             : null;
+        _notice = result.requiresConfirmation
+            ? null
+            : result.clarificationQuestion ?? result.message;
         _command.clear();
       });
       await _loadDay();
@@ -448,14 +450,6 @@ class _DayPageState extends State<DayPage> {
                                     .colorScheme
                                     .errorContainer,
                               )
-                            : _notice != null
-                            ? _MessageCard(
-                                key: const ValueKey('notice'),
-                                message: _notice!,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .secondaryContainer,
-                              )
                             : _confirmation != null
                             ? _ConfirmationCard(
                                 key: const ValueKey('confirmation'),
@@ -467,6 +461,14 @@ class _DayPageState extends State<DayPage> {
                                   'cancelo',
                                   confirmation: _confirmation,
                                 ),
+                              )
+                            : _notice != null
+                            ? _MessageCard(
+                                key: const ValueKey('notice'),
+                                message: _notice!,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
                               )
                             : const SizedBox.shrink(),
                       ),
