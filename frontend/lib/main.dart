@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1030,36 +1031,80 @@ class _ConfirmationCard extends StatelessWidget {
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
   @override
-  Widget build(BuildContext context) => Card(
-    color: const Color(0xFFFFF9ED),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Confirma esta criação?',
-            style: Theme.of(context).textTheme.titleMedium,
+  Widget build(BuildContext context) => SizedBox(
+    width: double.infinity,
+    child: Card(
+      clipBehavior: Clip.antiAlias,
+      color: Colors.transparent,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                JubileuPalette.panelRaised.withValues(alpha: 0.94),
+                JubileuPalette.panel.withValues(alpha: 0.88),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(
+              color: JubileuPalette.lilac.withValues(alpha: 0.48),
+            ),
+            borderRadius: BorderRadius.circular(16),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'A ação só será registrada depois da sua confirmação explícita.',
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 17),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.auto_awesome_rounded,
+                      color: JubileuPalette.lilac,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Confirma esta criação?',
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(color: JubileuPalette.ink),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 7),
+                const Text(
+                  'A ação só será registrada depois da sua confirmação explícita.',
+                  style: TextStyle(color: JubileuPalette.muted),
+                ),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 8,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: onConfirm,
+                      icon: const Icon(Icons.check_rounded, size: 18),
+                      label: const Text('Confirmar'),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: onCancel,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: JubileuPalette.ink,
+                        side: BorderSide(
+                          color: JubileuPalette.ink.withValues(alpha: 0.34),
+                        ),
+                      ),
+                      icon: const Icon(Icons.close_rounded, size: 18),
+                      label: const Text('Cancelar'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            children: [
-              FilledButton(
-                onPressed: onConfirm,
-                child: const Text('Confirmar'),
-              ),
-              OutlinedButton(
-                onPressed: onCancel,
-                child: const Text('Cancelar'),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     ),
   );

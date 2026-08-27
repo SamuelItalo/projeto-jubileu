@@ -84,3 +84,4 @@
 - Primeiro teste real de Samuel confirmou que o microfone e a transcrição local funcionam, mas o modelo compacto pode omitir ou trocar palavras de comando. A interface agora coloca a transcrição no campo para revisão antes de “Registrar”, evitando que uma transcrição imperfeita produza um comando inválido.
 - Corrigida a prioridade visual de confirmação: quando uma criação estiver pendente, o cartão com os botões “Confirmar” e “Cancelar” é exibido antes de mensagens informativas.
 - Adicionado atalho de teclado local `F8`: enquanto o Jubileu estiver em foco, pressionar e segurar inicia a gravação; soltar encerra e inicia a transcrição. A transcrição continua exigindo revisão e o fluxo de confirmação para criar tarefas permanece obrigatório.
+- Ajustado o cartão de confirmação para o dashboard escuro: superfície grafite translúcida com desfoque, borda lilás, texto de alto contraste e botões de confirmação/cancelamento legíveis.
