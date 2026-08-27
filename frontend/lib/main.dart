@@ -292,9 +292,9 @@ class _DayPageState extends State<DayPage> {
       if (!mounted) return;
       setState(() {
         _command.text = transcript;
-        _notice = 'Entendi: “$transcript”';
+        _notice =
+            'Entendi: “$transcript”. Revise se necessário e clique em Registrar.';
       });
-      await _send(transcript);
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.message);
     } finally {

@@ -10,7 +10,7 @@ Permitir que Samuel dite um comando pressionando um botão, sem enviar áudio ou
 2. Enquanto ele estiver pressionado, grava WAV mono PCM de 16 kHz em arquivo temporário do aplicativo.
 3. Ao soltar, o Flutter envia o arquivo autenticado a `POST /v1/transcriptions`.
 4. A API valida o arquivo e usa o Vosk local com o modelo `vosk-model-small-pt-0.3` para devolver somente `{ "transcript": "..." }`.
-5. O Flutter exibe a frase reconhecida e a envia como uma nova `VoiceCommandRequest` ao `POST /v1/commands`, preservando confirmação, idempotência e regras existentes.
+5. O Flutter preenche o campo de comando com a frase reconhecida. Samuel pode corrigi-la e clica em “Registrar” para enviá-la como uma nova `VoiceCommandRequest` ao `POST /v1/commands`, preservando confirmação, idempotência e regras existentes.
 
 ## Limites e privacidade
 

@@ -135,6 +135,12 @@ class ApiClient {
     if (statusCode == 410) {
       return 'A confirmação expirou. Envie o comando novamente.';
     }
+    if (statusCode == 422 && code == 'no_speech_recognized') {
+      return 'Não consegui reconhecer sua fala. Segure o botão, fale mais perto do microfone e solte ao terminar.';
+    }
+    if (statusCode == 422 && code == 'invalid_audio') {
+      return 'A gravação não ficou em um formato válido. Tente novamente.';
+    }
     return 'Não foi possível concluir a solicitação agora.';
   }
 
