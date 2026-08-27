@@ -10,7 +10,9 @@ Permitir que Samuel dite um comando pressionando um botão, sem enviar áudio ou
 2. Enquanto ele estiver pressionado, grava WAV mono PCM de 16 kHz em arquivo temporário do aplicativo.
 3. Ao soltar, o Flutter envia o arquivo autenticado a `POST /v1/transcriptions`.
 4. A API valida o arquivo e usa o Vosk local com o modelo `vosk-model-small-pt-0.3` para devolver somente `{ "transcript": "..." }`.
-5. O Flutter preenche o campo de comando com a frase reconhecida. Samuel pode corrigi-la e clica em “Registrar” para enviá-la como uma nova `VoiceCommandRequest` ao `POST /v1/commands`, preservando confirmação, idempotência e regras existentes.
+5. O Flutter preenche o campo de comando com a frase reconhecida, mostra-a e a reproduz por voz. Ela entra em estado local de revisão e **não** é enviada ao `POST /v1/commands` ainda.
+6. Samuel pode revisar o texto e usar `F8` novamente para dizer `confirmo`/`enviar` ou `cancelo`/`descartar`. Os botões visuais “Enviar” e “Descartar” fornecem o mesmo controle.
+7. Ao confirmar o envio, o Flutter envia a frase original como uma nova `VoiceCommandRequest`. Para criação de tarefa, o backend devolve sua confirmação formal persistida; o Flutter a lê e aceita `confirmo`/`cancelo` por voz, sempre com o `confirmation_context` opaco correspondente.
 
 ## Limites e privacidade
 
@@ -32,6 +34,7 @@ O endpoint não interpreta intenção, não cria tarefas e não aceita `confirma
 
 - Flutter Linux: `parecord`, `pactl` e `ffmpeg` para o pacote `record`.
 - Backend: `vosk` e o modelo oficial compacto em português.
+- Resposta local: Piper com a voz `pt_BR-faber-medium` e `aplay`; `spd-say` é reserva se Piper não estiver disponível.
 
 ## Casos de borda
 
@@ -41,3 +44,5 @@ O endpoint não interpreta intenção, não cria tarefas e não aceita `confirma
 | Áudio sem fala reconhecível | Flutter informa que não reconheceu a fala e não envia comando. |
 | Fone P3 ou Easy Effects muda a fonte padrão | A gravação usa a fonte padrão do PipeWire; Samuel pode trocá-la nas configurações de som e tentar novamente. |
 | Falha de transcrição | Não há mudança de tarefa, e o arquivo temporário é removido. |
+| Fala de confirmação local diferente de `confirmo`/`enviar` ou `cancelo`/`descartar` | O Flutter mantém a transcrição pendente, explica as opções por voz e não envia comando. |
+| Confirmação formal de criação pendente | `confirmo`/`cancelo` é enviado com o contexto opaco recebido da API; nunca é tratado como uma nova tarefa. |

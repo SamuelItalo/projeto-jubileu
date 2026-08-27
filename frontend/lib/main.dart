@@ -11,6 +11,8 @@ import 'session_store.dart';
 import 'speech_output.dart';
 import 'voice_capture.dart';
 
+enum _VoiceApproval { confirm, cancel, unknown }
+
 void main() => runApp(const JubileuApp());
 
 class JubileuApp extends StatefulWidget {
@@ -245,6 +247,7 @@ class _DayPageState extends State<DayPage> {
   DateTime _selectedDate = DateTime.now();
   DateTime? _loadedAt;
   ConfirmationData? _confirmation;
+  String? _pendingTranscript;
   String? _notice;
   String? _error;
   bool _loading = true;
@@ -300,9 +303,8 @@ class _DayPageState extends State<DayPage> {
       if (!mounted) return;
       setState(() {
         _command.text = transcript;
-        _notice =
-            'Entendi: “$transcript”. Revise se necessário e clique em Registrar.';
       });
+      await _handleVoiceTranscript(transcript);
     } on ApiException catch (error) {
       if (mounted) setState(() => _error = error.message);
       unawaited(_speech.speak(error.message));
@@ -370,6 +372,101 @@ class _DayPageState extends State<DayPage> {
     } finally {
       if (mounted) setState(() => _sending = false);
     }
+  }
+
+  Future<void> _handleVoiceTranscript(String transcript) async {
+    if (_confirmation != null) {
+      await _resolveTaskConfirmation(transcript);
+      return;
+    }
+    if (_pendingTranscript != null) {
+      await _resolveTranscriptConfirmation(transcript);
+      return;
+    }
+
+    setState(() {
+      _pendingTranscript = transcript;
+      _notice = null;
+      _error = null;
+    });
+    unawaited(_speech.speak('Entendi: $transcript. Confirma o envio?'));
+  }
+
+  Future<void> _resolveTranscriptConfirmation(String reply) async {
+    switch (_voiceApproval(reply)) {
+      case _VoiceApproval.confirm:
+        await _approveTranscript();
+      case _VoiceApproval.cancel:
+        _discardTranscript();
+      case _VoiceApproval.unknown:
+        _askForVoiceApproval();
+    }
+  }
+
+  Future<void> _resolveTaskConfirmation(String reply) async {
+    final confirmation = _confirmation;
+    if (confirmation == null) return;
+    switch (_voiceApproval(reply)) {
+      case _VoiceApproval.confirm:
+        await _send('confirmo', confirmation: confirmation);
+      case _VoiceApproval.cancel:
+        await _send('cancelo', confirmation: confirmation);
+      case _VoiceApproval.unknown:
+        _askForVoiceApproval(taskCreation: true);
+    }
+  }
+
+  Future<void> _approveTranscript() async {
+    final transcript = _pendingTranscript;
+    if (transcript == null) return;
+    setState(() => _pendingTranscript = null);
+    await _send(transcript);
+  }
+
+  void _discardTranscript() {
+    if (_pendingTranscript == null) return;
+    setState(() {
+      _pendingTranscript = null;
+      _command.clear();
+      _notice = 'Transcrição descartada.';
+    });
+    unawaited(_speech.speak('Tudo bem. Descartei a transcrição.'));
+  }
+
+  void _askForVoiceApproval({bool taskCreation = false}) {
+    final message = taskCreation
+        ? 'Para confirmar a criação, diga confirmo. Para cancelar, diga cancelo.'
+        : 'Diga confirmo ou enviar para prosseguir. Para descartar, diga cancelo.';
+    setState(() {
+      _notice = message;
+      _error = null;
+    });
+    unawaited(_speech.speak(message));
+  }
+
+  _VoiceApproval _voiceApproval(String reply) {
+    final normalized = reply
+        .toLowerCase()
+        .replaceAll('á', 'a')
+        .replaceAll('à', 'a')
+        .replaceAll('ã', 'a')
+        .replaceAll('â', 'a')
+        .replaceAll('é', 'e')
+        .replaceAll('ê', 'e')
+        .replaceAll('í', 'i')
+        .replaceAll('ó', 'o')
+        .replaceAll('ô', 'o')
+        .replaceAll('õ', 'o')
+        .replaceAll('ú', 'u')
+        .replaceAll(RegExp(r'[^a-z ]'), ' ')
+        .trim();
+    if (RegExp(r'^(confirmo|confirmar|enviar|sim)\b').hasMatch(normalized)) {
+      return _VoiceApproval.confirm;
+    }
+    if (RegExp(r'^(cancelo|cancelar|descartar|nao)\b').hasMatch(normalized)) {
+      return _VoiceApproval.cancel;
+    }
+    return _VoiceApproval.unknown;
   }
 
   int get _activeSeconds => _day?.activeTask == null || _loadedAt == null
@@ -503,6 +600,17 @@ class _DayPageState extends State<DayPage> {
                                   confirmation: _confirmation,
                                 ),
                               )
+                            : _pendingTranscript != null
+                            ? _ConfirmationCard(
+                                key: const ValueKey('transcript-confirmation'),
+                                title: 'Confirma o envio?',
+                                message:
+                                    'Vou enviar esta transcrição: “${_pendingTranscript!}”.',
+                                confirmLabel: 'Enviar',
+                                cancelLabel: 'Descartar',
+                                onConfirm: _approveTranscript,
+                                onCancel: _discardTranscript,
+                              )
                             : _notice != null
                             ? _MessageCard(
                                 key: const ValueKey('notice'),
@@ -515,7 +623,8 @@ class _DayPageState extends State<DayPage> {
                       ),
                       if (_error != null ||
                           _notice != null ||
-                          _confirmation != null)
+                          _confirmation != null ||
+                          _pendingTranscript != null)
                         const SizedBox(height: 12),
                       if (_loading && day == null)
                         const Padding(
@@ -1060,9 +1169,18 @@ class _ConfirmationCard extends StatelessWidget {
     super.key,
     required this.onConfirm,
     required this.onCancel,
+    this.title = 'Confirma esta criação?',
+    this.message =
+        'A ação só será registrada depois da sua confirmação explícita.',
+    this.confirmLabel = 'Confirmar',
+    this.cancelLabel = 'Cancelar',
   });
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
+  final String title;
+  final String message;
+  final String confirmLabel;
+  final String cancelLabel;
   @override
   Widget build(BuildContext context) => SizedBox(
     width: double.infinity,
@@ -1100,16 +1218,16 @@ class _ConfirmationCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Confirma esta criação?',
+                      title,
                       style: Theme.of(context).textTheme.titleMedium
                           ?.copyWith(color: JubileuPalette.ink),
                     ),
                   ],
                 ),
                 const SizedBox(height: 7),
-                const Text(
-                  'A ação só será registrada depois da sua confirmação explícita.',
-                  style: TextStyle(color: JubileuPalette.muted),
+                Text(
+                  message,
+                  style: const TextStyle(color: JubileuPalette.muted),
                 ),
                 const SizedBox(height: 14),
                 Wrap(
@@ -1119,7 +1237,7 @@ class _ConfirmationCard extends StatelessWidget {
                     FilledButton.icon(
                       onPressed: onConfirm,
                       icon: const Icon(Icons.check_rounded, size: 18),
-                      label: const Text('Confirmar'),
+                      label: Text(confirmLabel),
                     ),
                     OutlinedButton.icon(
                       onPressed: onCancel,
@@ -1130,7 +1248,7 @@ class _ConfirmationCard extends StatelessWidget {
                         ),
                       ),
                       icon: const Icon(Icons.close_rounded, size: 18),
-                      label: const Text('Cancelar'),
+                      label: Text(cancelLabel),
                     ),
                   ],
                 ),

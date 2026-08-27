@@ -20,6 +20,8 @@ O Jubileu usa preferencialmente Piper com a voz neural local pt-BR `faber-medium
 
 Na tela principal, **Testar voz** reproduz uma frase sem criar ou alterar tarefas. A fala também responde a confirmações, resultados, esclarecimentos e erros relevantes.
 
+Para comandos ditados, o fluxo é: segure `F8`, diga o comando e solte; o Jubileu lê a transcrição e pergunta se confirma o envio. Segure `F8` novamente e diga `confirmo` (ou `enviar`) para prosseguir, ou `cancelo` (ou `descartar`) para removê-la. Uma criação de tarefa recebe então a confirmação formal adicional exigida pelo backend; responda `confirmo` ou `cancelo` novamente para concluir essa etapa.
+
 ## Comandos disponíveis
 
 Use um comando por vez, ou separe criações por `;`:
