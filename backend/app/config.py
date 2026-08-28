@@ -33,8 +33,8 @@ class Settings(BaseSettings):
             raise ValueError("APP_ALLOW_INSECURE_TEST_AUTH só é permitido em development ou test")
         if self.app_environment not in local_environments and not self.app_initial_password:
             raise ValueError("APP_INITIAL_PASSWORD é obrigatória fora de development/test")
-        if self.command_interpreter not in {"deterministic", "hybrid_ollama"}:
-            raise ValueError("COMMAND_INTERPRETER deve ser deterministic ou hybrid_ollama")
+        if self.command_interpreter not in {"deterministic", "hybrid_ollama", "ollama_first"}:
+            raise ValueError("COMMAND_INTERPRETER deve ser deterministic, hybrid_ollama ou ollama_first")
         if not self.database_url:
             if not self.postgres_password:
                 raise ValueError("POSTGRES_PASSWORD ou DATABASE_URL é obrigatório")

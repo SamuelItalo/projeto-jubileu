@@ -27,12 +27,12 @@ Para comandos ditados, o fluxo é: segure `F8`, diga o comando e solte; o Jubile
 O padrão continua sendo o parser determinístico, rápido e gratuito. Para entender frases mais naturais sem usar serviços externos, defina no `.env`:
 
 ```env
-COMMAND_INTERPRETER=hybrid_ollama
+COMMAND_INTERPRETER=ollama_first
 OLLAMA_BASE_URL=http://host.docker.internal:11434
 OLLAMA_MODEL=qwen3:4b-instruct
 ```
 
-Nesse modo, o Ollama local só é consultado se a frase não corresponder aos comandos conhecidos. Sua resposta é restrita a ações permitidas e continua sujeita às confirmações da aplicação. O serviço Ollama precisa estar ativo e acessível ao Docker na porta `11434`.
+Nesse modo, cada comando por voz é interpretado primeiro pelo Ollama local. Se ele estiver indisponível ou devolver um resultado inválido, o parser determinístico assume automaticamente. A resposta é restrita a ações permitidas e continua sujeita às confirmações da aplicação. O serviço Ollama precisa estar ativo e acessível ao Docker na porta `11434`.
 
 ## Comandos disponíveis
 

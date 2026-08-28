@@ -237,9 +237,13 @@ def process_command(db: Session, user: User, payload: VoiceCommandRequest) -> As
         response = _resolve_confirmation(db, user, request, payload)
         return _store_response(db, request, response)
 
-    parsed = parse_deterministic(payload.transcript)
     settings = get_settings()
-    if parsed.clarification_question and settings.command_interpreter == "hybrid_ollama":
+    parsed = parse_deterministic(payload.transcript)
+    if settings.command_interpreter == "ollama_first" and payload.source == "voice":
+        llm_parsed = parse_with_ollama(payload.transcript, settings)
+        if llm_parsed is not None:
+            parsed = llm_parsed
+    elif parsed.clarification_question and settings.command_interpreter == "hybrid_ollama":
         llm_parsed = parse_with_ollama(payload.transcript, settings)
         if llm_parsed is not None:
             parsed = llm_parsed

@@ -9,13 +9,13 @@ Receber um relato já transcrito, produzir uma interpretação estruturada e dev
 - Entrada contratada: `VoiceCommandRequest`, contendo somente a transcrição e metadados, conforme `gpeto.md`.
 - Saída contratada: `AssistantResponse`, conforme `gpeto.md`.
 - Contrato interno: `InterpretedCommand`, produzido pelo interpretador selecionado e validado pelo FastAPI, conforme `gpeto.md`.
-- Dependências: tarefas existentes e interpretador configurado. O padrão é o parser determinístico local; no modo `hybrid_ollama`, uma LLM local é usada somente como fallback para frases fora da gramática.
+- Dependências: tarefas existentes e interpretador configurado. O padrão é o parser determinístico local; no modo `hybrid_ollama`, uma LLM local é usada somente como fallback para frases fora da gramática. No modo `ollama_first`, ela interpreta primeiro comandos de voz e o parser determinístico é a reserva.
 
 ## Fluxo
 
 1. Validar campos obrigatórios, UUID, data/hora com fuso, `source` e transcrição não vazia.
 2. Rejeitar uma entrada inválida com `status: rejected` ou `error`; não gravar nem alterar tarefa.
-3. Sem `confirmation_context`, executar primeiro o parser determinístico. No modo `hybrid_ollama`, se ele não reconhecer a frase, enviar somente a transcrição ao Ollama local e validar integralmente o JSON estruturado recebido antes de continuar.
+3. Sem `confirmation_context`, aplicar o interpretador configurado. No modo `ollama_first`, enviar a transcrição de voz ao Ollama local e validar integralmente o JSON; em falha, indisponibilidade ou JSON inválido, usar o parser determinístico. No modo `hybrid_ollama`, executar primeiro o parser determinístico e consultar Ollama somente se ele não reconhecer a frase.
 4. Verificar se as ações candidatas se referem a tarefa existente de maneira inequívoca.
 5. Se faltar informação, existir mais de uma tarefa compatível ou a intenção for `unknown`, responder `needs_clarification`, preencher `clarification_question` e não executar ação. Tarefas com nomes semelhantes sempre exigem esclarecimento; o sistema pode oferecer criar uma nova, sem presumi-la.
 6. Para `create_task`, construir tarefas candidatas e sempre responder `awaiting_confirmation`; a confirmação por voz é obrigatória no MVP e as tarefas não são persistidas antes dela.
