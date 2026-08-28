@@ -21,4 +21,11 @@ async def create_transcription(
     if audio.content_type not in {"audio/wav", "audio/x-wav", "application/octet-stream"}:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail={"code": "invalid_audio"})
     content = await audio.read(5 * 1024 * 1024 + 1)
-    return TranscriptionResponse(transcript=transcribe_wav(content, settings.vosk_model_path))
+    return TranscriptionResponse(
+        transcript=transcribe_wav(
+            content,
+            vosk_model_path=settings.vosk_model_path,
+            whisper_model_path=settings.whisper_model_path,
+            engine=settings.transcription_engine,
+        )
+    )

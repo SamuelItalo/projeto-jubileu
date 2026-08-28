@@ -9,7 +9,7 @@ Permitir que Samuel dite um comando pressionando um botão, sem enviar áudio ou
 1. O Flutter mostra o botão “Segure para falar”.
 2. Enquanto ele estiver pressionado, grava WAV mono PCM de 16 kHz em arquivo temporário do aplicativo.
 3. Ao soltar, o Flutter envia o arquivo autenticado a `POST /v1/transcriptions`.
-4. A API valida o arquivo e usa o Vosk local com o modelo `vosk-model-small-pt-0.3` para devolver somente `{ "transcript": "..." }`.
+4. A API valida o arquivo e usa o Whisper local (`faster-whisper`, modelo `small`) para devolver somente `{ "transcript": "..." }`. Se o Whisper estiver indisponível ou falhar, usa o Vosk local como reserva.
 5. O Flutter preenche o campo de comando com a frase reconhecida, mostra-a e a reproduz por voz. Ela entra em estado local de revisão e **não** é enviada ao `POST /v1/commands` ainda.
 6. Samuel pode revisar o texto e usar `F8` novamente para dizer `confirmo`/`enviar` ou `cancelo`/`descartar`. Os botões visuais “Enviar” e “Descartar” fornecem o mesmo controle.
 7. Ao confirmar o envio, o Flutter envia a frase original como uma nova `VoiceCommandRequest`. Para criação de tarefa, o backend devolve sua confirmação formal persistida; o Flutter a lê e aceita `confirmo`/`cancelo` por voz, sempre com o `confirmation_context` opaco correspondente.
@@ -19,7 +19,7 @@ Permitir que Samuel dite um comando pressionando um botão, sem enviar áudio ou
 - A captura só existe enquanto o botão estiver pressionado; não há escuta contínua, palavra de ativação ou gravação em segundo plano.
 - O WAV é temporário e apagado pelo Flutter depois da transcrição, inclusive em erro.
 - O backend não persiste o arquivo de áudio; persiste apenas a transcrição já prevista em `voice_requests` quando o comando é enviado.
-- O modelo Vosk fica em `models/vosk-model-small-pt-0.3/`, fora do Git, montado somente-leitura no contêiner da API.
+- Os modelos Whisper e Vosk ficam em `models/`, fora do Git, montados somente-leitura no contêiner da API.
 - O endpoint aceita apenas WAV PCM mono, 16 bits e 16 kHz, com limite de 30 segundos e 5 MB. Formato inválido recebe `422 invalid_audio`; modelo indisponível recebe `503 transcription_unavailable`.
 
 ## Contrato HTTP
@@ -33,7 +33,7 @@ O endpoint não interpreta intenção, não cria tarefas e não aceita `confirma
 ## Dependências locais
 
 - Flutter Linux: `parecord`, `pactl` e `ffmpeg` para o pacote `record`.
-- Backend: `vosk` e o modelo oficial compacto em português.
+- Backend: `faster-whisper` com o modelo local `small`, executado em CPU com `int8`; Vosk é uma reserva para manter o serviço disponível.
 - Resposta local: Piper com a voz `pt_BR-faber-medium` e `aplay`; `spd-say` é reserva se Piper não estiver disponível.
 
 ## Casos de borda

@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     ollama_model: str = "qwen3:4b-instruct"
     ollama_timeout_seconds: float = 20.0
     openai_api_key: str | None = None
+    transcription_engine: str = "whisper"
+    whisper_model_path: str = "/models/faster-whisper-small"
     vosk_model_path: str = "/models/vosk-model-small-pt-0.3"
 
     @model_validator(mode="after")
@@ -35,6 +37,8 @@ class Settings(BaseSettings):
             raise ValueError("APP_INITIAL_PASSWORD é obrigatória fora de development/test")
         if self.command_interpreter not in {"deterministic", "hybrid_ollama", "ollama_first"}:
             raise ValueError("COMMAND_INTERPRETER deve ser deterministic, hybrid_ollama ou ollama_first")
+        if self.transcription_engine not in {"whisper", "vosk"}:
+            raise ValueError("TRANSCRIPTION_ENGINE deve ser whisper ou vosk")
         if not self.database_url:
             if not self.postgres_password:
                 raise ValueError("POSTGRES_PASSWORD ou DATABASE_URL é obrigatório")

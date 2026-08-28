@@ -14,6 +14,14 @@ O cliente Linux também possui o botão **Segure para falar**. Mantenha-o pressi
 
 O modelo local fica em `models/`, que não é versionado pelo Git. O microfone padrão do PipeWire é usado; se o fone P3 ou Easy Effects mudar a fonte, ajuste-a nas configurações de som do sistema e tente novamente.
 
+A transcrição principal usa Whisper local (`faster-whisper`, modelo `small`) em CPU. Para baixar o modelo após configurar o ambiente Python, execute uma vez na raiz do projeto:
+
+```bash
+./.venv/bin/python tools/download_whisper_model.py
+```
+
+O Vosk compacto permanece como reserva automática se o Whisper não estiver disponível.
+
 ## Resposta por voz local
 
 O Jubileu usa preferencialmente Piper com a voz neural local pt-BR `faber-medium`; não há transmissão de texto, áudio ou uso de serviços de IA na nuvem. Os arquivos do mecanismo estão no ambiente local `.venv/` e a voz está em `models/piper/`, ambos fora do Git. Se eles não estiverem disponíveis, o aplicativo usa `spd-say` como reserva.
