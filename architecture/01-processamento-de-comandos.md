@@ -9,13 +9,13 @@ Receber um relato já transcrito, produzir uma interpretação estruturada e dev
 - Entrada contratada: `VoiceCommandRequest`, contendo somente a transcrição e metadados, conforme `gpeto.md`.
 - Saída contratada: `AssistantResponse`, conforme `gpeto.md`.
 - Contrato interno: `InterpretedCommand`, produzido pelo interpretador selecionado e validado pelo FastAPI, conforme `gpeto.md`.
-- Dependências: tarefas existentes e interpretador configurado. O padrão do MVP é o parser determinístico local; a IA em nuvem é futura e opcional.
+- Dependências: tarefas existentes e interpretador configurado. O padrão é o parser determinístico local; no modo `hybrid_ollama`, uma LLM local é usada somente como fallback para frases fora da gramática.
 
 ## Fluxo
 
 1. Validar campos obrigatórios, UUID, data/hora com fuso, `source` e transcrição não vazia.
 2. Rejeitar uma entrada inválida com `status: rejected` ou `error`; não gravar nem alterar tarefa.
-3. Sem `confirmation_context`, enviar a transcrição ao interpretador configurado e validar integralmente o `InterpretedCommand` recebido antes de continuar. O parser determinístico local reconhece somente a gramática definida abaixo e não envia dados à rede.
+3. Sem `confirmation_context`, executar primeiro o parser determinístico. No modo `hybrid_ollama`, se ele não reconhecer a frase, enviar somente a transcrição ao Ollama local e validar integralmente o JSON estruturado recebido antes de continuar.
 4. Verificar se as ações candidatas se referem a tarefa existente de maneira inequívoca.
 5. Se faltar informação, existir mais de uma tarefa compatível ou a intenção for `unknown`, responder `needs_clarification`, preencher `clarification_question` e não executar ação. Tarefas com nomes semelhantes sempre exigem esclarecimento; o sistema pode oferecer criar uma nova, sem presumi-la.
 6. Para `create_task`, construir tarefas candidatas e sempre responder `awaiting_confirmation`; a confirmação por voz é obrigatória no MVP e as tarefas não são persistidas antes dela.
@@ -26,6 +26,7 @@ Receber um relato já transcrito, produzir uma interpretação estruturada e dev
 
 - Uma fala pode originar várias ações. Elas formam um grupo de confirmação: o usuário pode confirmá-lo/cancelá-lo por inteiro ou confirmar/cancelar cada item individualmente.
 - O interpretador só pode sugerir intenção e campos candidatos; não tem acesso ao PostgreSQL, não decide confirmação e não executa alterações.
+- O Ollama recebe um prompt de JSON estrito, possui timeout curto e só pode devolver os seis tipos de ação já existentes. JSON inválido, campos vazios, falha ou indisponibilidade devolvem esclarecimento, nunca uma ação parcial.
 - A criação de tarefa nunca é persistida enquanto estiver em `awaiting_confirmation`.
 - Uma resposta sempre conserva o mesmo `request_id` da entrada.
 - Retentativas do mesmo `request_id` não podem duplicar alterações já concluídas; elas devolvem a resposta já persistida, conforme a estratégia de idempotência definida no POP 03.

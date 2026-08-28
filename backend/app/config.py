@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     app_initial_password: str | None = None
     app_allow_insecure_test_auth: bool = False
     command_interpreter: str = "deterministic"
+    ollama_base_url: str = "http://host.docker.internal:11434"
+    ollama_model: str = "qwen3:4b-instruct"
+    ollama_timeout_seconds: float = 20.0
     openai_api_key: str | None = None
     vosk_model_path: str = "/models/vosk-model-small-pt-0.3"
 
@@ -30,8 +33,8 @@ class Settings(BaseSettings):
             raise ValueError("APP_ALLOW_INSECURE_TEST_AUTH só é permitido em development ou test")
         if self.app_environment not in local_environments and not self.app_initial_password:
             raise ValueError("APP_INITIAL_PASSWORD é obrigatória fora de development/test")
-        if self.command_interpreter != "deterministic":
-            raise ValueError("Somente COMMAND_INTERPRETER=deterministic está disponível no MVP atual")
+        if self.command_interpreter not in {"deterministic", "hybrid_ollama"}:
+            raise ValueError("COMMAND_INTERPRETER deve ser deterministic ou hybrid_ollama")
         if not self.database_url:
             if not self.postgres_password:
                 raise ValueError("POSTGRES_PASSWORD ou DATABASE_URL é obrigatório")

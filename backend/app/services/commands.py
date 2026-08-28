@@ -7,9 +7,11 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.models import PendingAction, PendingActionGroup, Task, TaskNote, TaskTimeInterval, User, VoiceRequest
 from app.schemas import AssistantResponse, ConfirmationContext, TaskResponse, VoiceCommandRequest
 from app.services.interpreter import ParsedAction, confirmation_decision, normalize, parse_deterministic
+from app.services.ollama import parse_with_ollama
 
 
 def _task_response(db: Session, task: Task) -> TaskResponse:
@@ -236,6 +238,11 @@ def process_command(db: Session, user: User, payload: VoiceCommandRequest) -> As
         return _store_response(db, request, response)
 
     parsed = parse_deterministic(payload.transcript)
+    settings = get_settings()
+    if parsed.clarification_question and settings.command_interpreter == "hybrid_ollama":
+        llm_parsed = parse_with_ollama(payload.transcript, settings)
+        if llm_parsed is not None:
+            parsed = llm_parsed
     if parsed.clarification_question:
         response = AssistantResponse(
             request_id=payload.request_id,

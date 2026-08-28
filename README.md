@@ -22,6 +22,18 @@ Na tela principal, **Testar voz** reproduz uma frase sem criar ou alterar tarefa
 
 Para comandos ditados, o fluxo é: segure `F8`, diga o comando e solte; o Jubileu lê a transcrição e pergunta se confirma o envio. Segure `F8` novamente e diga `confirmo` (ou `enviar`) para prosseguir, ou `cancelo` (ou `descartar`) para removê-la. Uma criação de tarefa recebe então a confirmação formal adicional exigida pelo backend; responda `confirmo` ou `cancelo` novamente para concluir essa etapa.
 
+## Interpretação local com Ollama
+
+O padrão continua sendo o parser determinístico, rápido e gratuito. Para entender frases mais naturais sem usar serviços externos, defina no `.env`:
+
+```env
+COMMAND_INTERPRETER=hybrid_ollama
+OLLAMA_BASE_URL=http://host.docker.internal:11434
+OLLAMA_MODEL=qwen3:4b-instruct
+```
+
+Nesse modo, o Ollama local só é consultado se a frase não corresponder aos comandos conhecidos. Sua resposta é restrita a ações permitidas e continua sujeita às confirmações da aplicação. O serviço Ollama precisa estar ativo e acessível ao Docker na porta `11434`.
+
 ## Comandos disponíveis
 
 Use um comando por vez, ou separe criações por `;`:
