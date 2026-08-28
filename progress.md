@@ -92,3 +92,4 @@
 - Integrado o modo opcional `hybrid_ollama`: o parser determinístico continua prioritário e o Ollama local `qwen3:4b-instruct` é consultado somente para frases fora da gramática. A resposta da LLM é limitada a JSON de ações permitidas, validada pelo backend e nunca executa nada sem as confirmações existentes.
 - Configurado o modo `ollama_first` para os comandos por voz: o Qwen local interpreta primeiro; em erro, indisponibilidade ou resultado inválido, o parser determinístico assume.
 - Substituído o Vosk compacto como transcritor principal por Whisper local (`faster-whisper`, modelo `small`) para elevar a precisão em português. A implementação mantém Vosk como reserva automática; modelo de 464 MB validado dentro da API Docker.
+- Ampliado o vocabulário de confirmação para tolerar variações de transcrição de `confirmo` e liberado o atalho vocal direto de conclusão da tarefa ativa (`finalizar`, `concluir` ou `encerrar`), sem confirmação intermediária.

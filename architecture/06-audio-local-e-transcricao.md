@@ -11,7 +11,7 @@ Permitir que Samuel dite um comando pressionando um botão, sem enviar áudio ou
 3. Ao soltar, o Flutter envia o arquivo autenticado a `POST /v1/transcriptions`.
 4. A API valida o arquivo e usa o Whisper local (`faster-whisper`, modelo `small`) para devolver somente `{ "transcript": "..." }`. Se o Whisper estiver indisponível ou falhar, usa o Vosk local como reserva.
 5. O Flutter preenche o campo de comando com a frase reconhecida, mostra-a e a reproduz por voz. Ela entra em estado local de revisão e **não** é enviada ao `POST /v1/commands` ainda.
-6. Samuel pode revisar o texto e usar `F8` novamente para dizer `confirmo`/`enviar` ou `cancelo`/`descartar`. Os botões visuais “Enviar” e “Descartar” fornecem o mesmo controle.
+6. Samuel pode revisar o texto e usar `F8` novamente para dizer `confirmo`/`enviar` ou `cancelo`/`descartar`. Os botões visuais “Enviar” e “Descartar” fornecem o mesmo controle. `finalizar`, `finalizar tarefa`, `concluir` ou `encerrar`, quando há tarefa em andamento, encerra essa tarefa diretamente sem a confirmação local intermediária.
 7. Ao confirmar o envio, o Flutter envia a frase original como uma nova `VoiceCommandRequest`. Para criação de tarefa, o backend devolve sua confirmação formal persistida; o Flutter a lê e aceita `confirmo`/`cancelo` por voz, sempre com o `confirmation_context` opaco correspondente.
 
 ## Limites e privacidade

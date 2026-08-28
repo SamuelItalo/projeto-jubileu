@@ -30,6 +30,8 @@ Na tela principal, **Testar voz** reproduz uma frase sem criar ou alterar tarefa
 
 Para comandos ditados, o fluxo é: segure `F8`, diga o comando e solte; o Jubileu lê a transcrição e pergunta se confirma o envio. Segure `F8` novamente e diga `confirmo` (ou `enviar`) para prosseguir, ou `cancelo` (ou `descartar`) para removê-la. Uma criação de tarefa recebe então a confirmação formal adicional exigida pelo backend; responda `confirmo` ou `cancelo` novamente para concluir essa etapa.
 
+Com uma tarefa em andamento, os atalhos vocais `finalizar`, `finalizar tarefa`, `concluir` ou `encerrar` a encerram diretamente, sem a confirmação local intermediária. O Jubileu usa automaticamente o título da tarefa em execução.
+
 ## Interpretação local com Ollama
 
 O padrão continua sendo o parser determinístico, rápido e gratuito. Para entender frases mais naturais sem usar serviços externos, defina no `.env`:

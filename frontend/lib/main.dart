@@ -383,6 +383,18 @@ class _DayPageState extends State<DayPage> {
       await _resolveTranscriptConfirmation(transcript);
       return;
     }
+    final activeTask = _day?.activeTask;
+    if (activeTask != null && _isFinishActiveTaskShortcut(transcript)) {
+      final command = 'concluir ${activeTask.title}';
+      setState(() {
+        _command.text = command;
+        _notice = 'Finalizando ${activeTask.title}…';
+        _error = null;
+      });
+      unawaited(_speech.speak('Finalizando ${activeTask.title}.'));
+      await _send(command);
+      return;
+    }
 
     setState(() {
       _pendingTranscript = transcript;
@@ -445,29 +457,47 @@ class _DayPageState extends State<DayPage> {
   }
 
   _VoiceApproval _voiceApproval(String reply) {
-    final normalized = reply
-        .toLowerCase()
-        .replaceAll('á', 'a')
-        .replaceAll('à', 'a')
-        .replaceAll('ã', 'a')
-        .replaceAll('â', 'a')
-        .replaceAll('é', 'e')
-        .replaceAll('ê', 'e')
-        .replaceAll('í', 'i')
-        .replaceAll('ó', 'o')
-        .replaceAll('ô', 'o')
-        .replaceAll('õ', 'o')
-        .replaceAll('ú', 'u')
-        .replaceAll(RegExp(r'[^a-z ]'), ' ')
-        .trim();
-    if (RegExp(r'^(confirmo|confirmar|enviar|sim)\b').hasMatch(normalized)) {
+    final normalized = _normalizeVoiceText(reply);
+    if (RegExp(r'^(confirm|conferm|enviar|sim)\b').hasMatch(normalized)) {
       return _VoiceApproval.confirm;
     }
-    if (RegExp(r'^(cancelo|cancelar|descartar|nao)\b').hasMatch(normalized)) {
+    if (RegExp(r'^(canc|descart|nao)\b').hasMatch(normalized)) {
       return _VoiceApproval.cancel;
     }
     return _VoiceApproval.unknown;
   }
+
+  bool _isFinishActiveTaskShortcut(String transcript) {
+    const shortcuts = {
+      'finalizar',
+      'finalizar tarefa',
+      'finalizar a tarefa',
+      'concluir',
+      'concluir tarefa',
+      'concluir a tarefa',
+      'encerrar',
+      'encerrar tarefa',
+      'terminar',
+      'terminar tarefa',
+    };
+    return shortcuts.contains(_normalizeVoiceText(transcript));
+  }
+
+  String _normalizeVoiceText(String value) => value
+      .toLowerCase()
+      .replaceAll('á', 'a')
+      .replaceAll('à', 'a')
+      .replaceAll('ã', 'a')
+      .replaceAll('â', 'a')
+      .replaceAll('é', 'e')
+      .replaceAll('ê', 'e')
+      .replaceAll('í', 'i')
+      .replaceAll('ó', 'o')
+      .replaceAll('ô', 'o')
+      .replaceAll('õ', 'o')
+      .replaceAll('ú', 'u')
+      .replaceAll(RegExp(r'[^a-z ]'), ' ')
+      .trim();
 
   int get _activeSeconds => _day?.activeTask == null || _loadedAt == null
       ? 0

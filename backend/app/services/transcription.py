@@ -13,7 +13,8 @@ from vosk import KaldiRecognizer, Model
 
 _WHISPER_PROMPT = (
     "Comandos do Jubileu: criar tarefa, iniciar tarefa, pausar tarefa, retomar tarefa, "
-    "concluir tarefa, adicionar nota, revisar orçamento."
+    "concluir tarefa, finalizar tarefa, adicionar nota, revisar orçamento, confirmar, confirmo, "
+    "enviar, cancelar, cancelo, descartar."
 )
 
 
